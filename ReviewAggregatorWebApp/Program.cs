@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using ReviewAggregatorWebApp.Models;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text;
+using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Repository;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Подключение сервисов
 builder.Services.AddDbContext<Db8428Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection")));
+builder.Services.AddTransient<IAllUsers, UserRepository>();
+builder.Services.AddTransient<IAllDirectors, DirectorRepository>();
+builder.Services.AddTransient<IAllGenres, GenreRepository>();
+builder.Services.AddTransient<IAllCountries, CountryRepository>();
+builder.Services.AddTransient<IAllMovies, MovieRepository>();
+builder.Services.AddTransient<IAllReviews, ReviewRepository>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
 builder.Services.AddSession(); // Добавляем поддержку сессий
@@ -26,7 +34,7 @@ app.UseMiddleware<CachingMiddleware>();
 // Использование сессий
 app.UseSession();
 
-var validTableNames = new HashSet<string> { "users", "genres", "movies", "reviews", "users", "allmovies" };
+var validTableNames = new HashSet<string> { "genres", "directors", "countries", "movies", "reviews", "users", "allmovies" };
 
 // Middleware для обработки запросов
 app.Use(async (context, next) =>

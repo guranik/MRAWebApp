@@ -20,4 +20,9 @@ public partial class Review
     public virtual Movie Movie { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
+
+    public override string ToString()
+    {
+        return $"Review of movie: {Movie.Name}. Author of review: {User.Login}. Date of review: {PostDate}. Review text: {ReviewText}. Rating: {Rating}";
+    }
 }

@@ -14,4 +14,9 @@ public partial class User
     public string Email { get; set; } = null!;
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+    public override string ToString()
+    {
+        return $"Login: {Login}; Password: {Password}; E-mail: {Email}.";
+    }
 }

@@ -24,4 +24,11 @@ public partial class Movie
     public virtual ICollection<Country> Countries { get; set; } = new List<Country>();
 
     public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
+
+    public override string ToString()
+    {
+        string Genres = string.Join(", ", this.Genres.Select(obj => obj.ToString()));
+        string Countries = string.Join(", ", this.Countries.Select(obj => obj.ToString()));
+        return $"{Name}: released in {ReleaseDate}, by director: {Director}, has rating: {Rating}. Genres: {Genres}. Countries of action: {Countries}";
+    }
 }

@@ -15,6 +15,6 @@ public partial class AllMovie
 
     public override string ToString()
     {
-        return $"{Режиссер}: {НазваниеФильма}, {ДатаВыхода}, {Рейтинг}"; // Пример формата
+        return $"{Режиссер}: {НазваниеФильма}, {ДатаВыхода}, {Рейтинг}";
     }
 }

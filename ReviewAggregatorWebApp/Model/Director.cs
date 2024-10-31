@@ -10,4 +10,9 @@ public partial class Director
     public string Name { get; set; } = null!;
 
     public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
+
+    public override string ToString()
+    {
+        return $"{Name}";
+    }
 }
