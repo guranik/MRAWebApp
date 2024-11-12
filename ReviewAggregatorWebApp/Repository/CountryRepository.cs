@@ -17,5 +17,27 @@ namespace ReviewAggregatorWebApp.Repository
         }
 
         public IEnumerable<Country> AllCountries => _context.Countries;
+
+        public Country GetById(int id) => _context.Countries.Find(id)
+            ?? throw new InvalidOperationException($"Country with ID {id} not found.");
+
+        public void Create(Country country)
+        {
+            _context.Countries.Add(country);
+            _context.SaveChanges();
+        }
+
+        public void Update(Country country)
+        {
+            _context.Countries.Update(country);
+            _context.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+            var country = GetById(id);
+            _context.Countries.Remove(country);
+            _context.SaveChanges();
+        }
     }
 }

@@ -17,5 +17,27 @@ namespace ReviewAggregatorWebApp.Repository
         }
 
         public IEnumerable<Director> AllDirectors => _context.Directors;
+
+        public Director GetById(int id) => _context.Directors.Find(id)
+            ?? throw new InvalidOperationException($"Director with ID {id} not found.");
+
+        public void Create(Director director)
+        {
+            _context.Directors.Add(director);
+            _context.SaveChanges();
+        }
+
+        public void Update(Director director)
+        {
+            _context.Directors.Update(director);
+            _context.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+            var director = GetById(id);
+            _context.Directors.Remove(director);
+            _context.SaveChanges();
+        }
     }
 }

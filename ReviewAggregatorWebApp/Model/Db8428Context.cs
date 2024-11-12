@@ -16,8 +16,6 @@ public partial class Db8428Context : DbContext
     {
     }
 
-    public virtual DbSet<AllMovie> AllMovies { get; set; }
-
     public virtual DbSet<Country> Countries { get; set; }
 
     public virtual DbSet<Director> Directors { get; set; }
@@ -25,10 +23,6 @@ public partial class Db8428Context : DbContext
     public virtual DbSet<Genre> Genres { get; set; }
 
     public virtual DbSet<Movie> Movies { get; set; }
-
-    public virtual DbSet<MoviesFilteredByRating> MoviesFilteredByRatings { get; set; }
-
-    public virtual DbSet<MoviesFilteredByReleaseDate> MoviesFilteredByReleaseDates { get; set; }
 
     public virtual DbSet<Review> Reviews { get; set; }
 
@@ -71,16 +65,6 @@ public partial class Db8428Context : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AllMovie>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("AllMovies");
-
-            entity.Property(e => e.ДатаВыхода).HasColumnName("Дата выхода");
-            entity.Property(e => e.НазваниеФильма).HasColumnName("Название фильма");
-            entity.Property(e => e.Рейтинг).HasColumnType("decimal(18, 2)");
-        });
 
         modelBuilder.Entity<Country>(entity =>
         {
@@ -115,28 +99,6 @@ public partial class Db8428Context : DbContext
             entity.Property(e => e.Rating).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Director).WithMany(p => p.Movies).HasForeignKey(d => d.DirectorId);
-        });
-
-        modelBuilder.Entity<MoviesFilteredByRating>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("MoviesFilteredByRating");
-
-            entity.Property(e => e.ДатаВыхода).HasColumnName("Дата выхода");
-            entity.Property(e => e.НазваниеФильма).HasColumnName("Название фильма");
-            entity.Property(e => e.Оценка).HasColumnType("decimal(18, 2)");
-        });
-
-        modelBuilder.Entity<MoviesFilteredByReleaseDate>(entity =>
-        {
-            entity
-                .HasNoKey()
-                .ToView("MoviesFilteredByReleaseDate");
-
-            entity.Property(e => e.ДатаВыходаФильма).HasColumnName("Дата выхода фильма");
-            entity.Property(e => e.НазваниеФильма).HasColumnName("Название фильма");
-            entity.Property(e => e.Оценка).HasColumnType("decimal(18, 2)");
         });
 
         modelBuilder.Entity<Review>(entity =>

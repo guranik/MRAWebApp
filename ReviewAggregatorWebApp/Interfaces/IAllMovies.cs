@@ -11,5 +11,8 @@ namespace ReviewAggregatorWebApp.Interfaces
     {
         IEnumerable<Movie> AllMovies { get; }
         Movie GetById(int id);
+        void Create(Movie movie);
+        void Update(Movie movie);
+        void Delete(int id);
     }
 }

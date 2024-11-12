@@ -12,5 +12,8 @@ namespace ReviewAggregatorWebApp.Interfaces
         IEnumerable<Review> AllReviews { get; }
         IEnumerable<Review> GetByMovieId(int movieId);
         Review GetById(int id);
+        void Create(Review review);
+        void Update(Review review);
+        void Delete(int id);
     }
 }

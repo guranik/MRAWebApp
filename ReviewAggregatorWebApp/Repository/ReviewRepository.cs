@@ -26,9 +26,29 @@ namespace ReviewAggregatorWebApp.Repository
             .Include(x => x.Movie)
             .FirstOrDefault(x => x.Id == id)
             ?? throw new InvalidOperationException($"Review with ID {id} not found.");
+
         public IEnumerable<Review> GetByMovieId(int movieId) => _context.Reviews
             .Where(x => x.MovieId == movieId)
-            .Include(x=> x.User)
-            .Include(x=> x.Movie);
+            .Include(x => x.User)
+            .Include(x => x.Movie);
+
+        public void Create(Review review)
+        {
+            _context.Reviews.Add(review);
+            _context.SaveChanges();
+        }
+
+        public void Update(Review review)
+        {
+            _context.Reviews.Update(review);
+            _context.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+            var review = GetById(id);
+            _context.Reviews.Remove(review);
+            _context.SaveChanges();
+        }
     }
 }

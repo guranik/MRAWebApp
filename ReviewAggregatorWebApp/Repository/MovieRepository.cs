@@ -28,5 +28,24 @@ namespace ReviewAggregatorWebApp.Repository
             .Include(x => x.Countries)
             .FirstOrDefault(x => x.Id == id) ??
                 throw new InvalidOperationException($"Movie with ID {id} not found.");
+
+        public void Create(Movie movie)
+        {
+            _context.Movies.Add(movie);
+            _context.SaveChanges();
+        }
+
+        public void Update(Movie movie)
+        {
+            _context.Movies.Update(movie);
+            _context.SaveChanges();
+        }
+
+        public void Delete(int id)
+        {
+            var movie = GetById(id);
+            _context.Movies.Remove(movie);
+            _context.SaveChanges();
+        }
     }
 }

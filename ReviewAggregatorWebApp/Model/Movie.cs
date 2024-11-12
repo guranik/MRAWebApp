@@ -2,22 +2,21 @@
 using System.Collections.Generic;
 
 namespace ReviewAggregatorWebApp.Model;
-
 public partial class Movie
 {
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 
-    public string PosterLink { get; set; } = null!;
+    public string? PosterLink { get; set; }
 
-    public int DirectorId { get; set; }
+    public int? DirectorId { get; set; }
 
     public DateTime ReleaseDate { get; set; }
 
     public decimal Rating { get; set; }
 
-    public virtual Director Director { get; set; } = null!;
+    public virtual Director? Director { get; set; }
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 

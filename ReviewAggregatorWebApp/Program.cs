@@ -9,6 +9,9 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Text;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Repository;
+using Microsoft.Extensions.Configuration;
+using ReviewAggregatorWebApp.Middleware.ApiResponseData;
+using Microsoft.Extensions.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +19,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Подключение сервисов
 builder.Services.AddDbContext<Db8428Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection")));
+builder.Services.Configure<InitializationInfo>(builder.Configuration.GetSection("InitializationInfo"));
+builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<InitializationInfo>>().Value);
 builder.Services.AddTransient<IAllUsers, UserRepository>();
 builder.Services.AddTransient<IAllDirectors, DirectorRepository>();
 builder.Services.AddTransient<IAllGenres, GenreRepository>();
@@ -27,6 +32,23 @@ builder.Services.AddMemoryCache();
 builder.Services.AddSession(); // Добавляем поддержку сессий
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var movieRepository = services.GetRequiredService<IAllMovies>();
+    var directorRepository = services.GetRequiredService<IAllDirectors>();
+    var genreRepository = services.GetRequiredService<IAllGenres>();
+    var countryRepository = services.GetRequiredService<IAllCountries>();
+    var initializationInfo = services.GetRequiredService<InitializationInfo>();
+
+    var databaseInitializer = new DatabaseInitializer(movieRepository, directorRepository, genreRepository, countryRepository, initializationInfo);
+    try
+    {
+        await databaseInitializer.InitializeAsync();
+    }
+    catch(Exception){ }
+}
 
 // Использование middleware для кэширования
 app.UseMiddleware<CachingMiddleware>();
@@ -59,7 +81,7 @@ app.Use(async (context, next) =>
                 if (dataList != null)
                 {
                     var htmlOutput = new StringBuilder();
-                    htmlOutput.Append("<html><body>");
+                    htmlOutput.Append("<html<head><meta charset='UTF-8'></head>><body>");
                     htmlOutput.Append($"<h2>Data from {tableName} table:</h2>");
                     htmlOutput.Append("<ul>"); // Используем список для отображения объектов
 
@@ -96,6 +118,23 @@ app.Use(async (context, next) =>
     }
     else if (path.Contains("/searchform1"))
     {
+        if (context.Request.Method == "POST")
+        {
+            // Чтение данных из формы
+            var firstname = context.Request.Form["firstname"];
+            var lastname = context.Request.Form["lastname"];
+            var options = context.Request.Form["options"];
+
+            // Сохранение данных в куки
+            context.Response.Cookies.Append("firstname", firstname);
+            context.Response.Cookies.Append("lastname", lastname);
+            context.Response.Cookies.Append("options", options);
+
+            // Перенаправление на ту же страницу, чтобы обновить куки
+            context.Response.Redirect("/searchform1");
+            return;
+        }
+
         // Чтение данных из куки для заполнения формы
         var savedFirstname = context.Request.Cookies["firstname"] ?? string.Empty;
         var savedLastname = context.Request.Cookies["lastname"] ?? string.Empty;
@@ -104,6 +143,9 @@ app.Use(async (context, next) =>
         // Выводим HTML формы для поиска с сохраненными значениями
         await context.Response.WriteAsync($@"
                 <html>
+                <head>
+                    <meta charset='UTF-8'>
+                </head>
                 <body>
                     <form method='post' action='/searchform1'>
                         First name:<br>

@@ -28,20 +28,16 @@ namespace ReviewAggregatorWebApp.Middleware
             // Создаем новый скоуп
             using (var scope = _scopeFactory.CreateScope())
             {
-                var userRepository = scope.ServiceProvider.GetRequiredService<IAllUsers>();
                 var movieRepository = scope.ServiceProvider.GetRequiredService<IAllMovies>();
                 var countryRepository = scope.ServiceProvider.GetRequiredService<IAllCountries>();
                 var directorRepository = scope.ServiceProvider.GetRequiredService<IAllDirectors>();
                 var genreRepository = scope.ServiceProvider.GetRequiredService<IAllGenres>();
-                var reviewRepository = scope.ServiceProvider.GetRequiredService<IAllReviews>();
 
                 // Кэширование данных из каждой таблицы последовательно
                 await CacheData("countries", countryRepository.AllCountries.AsQueryable().Take(20).ToListAsync());
                 await CacheData("directors", directorRepository.AllDirectors.AsQueryable().Take(20).ToListAsync());
                 await CacheData("genres", genreRepository.AllGenres.AsQueryable().Take(20).ToListAsync());
                 await CacheData("movies", movieRepository.AllMovies.AsQueryable().Take(20).ToListAsync());
-                await CacheData("reviews", reviewRepository.AllReviews.AsQueryable().Take(20).ToListAsync());
-                await CacheData("users", userRepository.AllUsers.AsQueryable().Take(20).ToListAsync());
             }
 
             await _next(context); // Передаем управление следующему компоненту
