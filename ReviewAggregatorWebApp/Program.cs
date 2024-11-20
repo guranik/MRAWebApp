@@ -30,6 +30,7 @@ builder.Services.AddTransient<IAllReviews, ReviewRepository>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
 builder.Services.AddSession(); // Добавляем поддержку сессий
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
@@ -47,7 +48,7 @@ using (var scope = app.Services.CreateScope())
     {
         await databaseInitializer.InitializeAsync();
     }
-    catch(Exception){ }
+    catch(Exception  ex){ }
 }
 
 // Использование middleware для кэширования
@@ -56,7 +57,7 @@ app.UseMiddleware<CachingMiddleware>();
 // Использование сессий
 app.UseSession();
 
-var validTableNames = new HashSet<string> { "genres", "directors", "countries", "movies", "reviews", "users", "allmovies" };
+var validTableNames = new HashSet<string> { "directors", "countries", "movies" };
 
 // Middleware для обработки запросов
 app.Use(async (context, next) =>
@@ -224,9 +225,24 @@ app.Use(async (context, next) =>
 
 // Добавление маршрутизации MVC (если используется)
 app.UseRouting();
-app.UseEndpoints(endpoints =>
-{
-    // Здесь можно добавить маршруты для контроллеров, если они есть
-});
+
+app.MapControllerRoute(
+    name: "movies",
+    pattern: "MoviesList/{action=Index}/{id?}",
+    defaults: new { controller = "MoviesList" });
+
+app.MapControllerRoute(
+    name: "movieDetails",
+    pattern: "MovieInfo/Details/{id}",
+    defaults: new { controller = "MovieInfo", action = "Details" });
+
+app.MapControllerRoute(
+    name: "genres",
+    pattern: "Genres/{action=Index}/{id?}",
+    defaults: new { controller = "Genres" });
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

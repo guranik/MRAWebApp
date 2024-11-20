@@ -1,25 +1,42 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ReviewAggregatorWebApp.Controllers
 {
     public class MovieInfoController : Controller
     {
-        private readonly Db8428Context _context; // Замените на ваш контекст БД
+        private readonly IMemoryCache _cache;
 
-        public MovieInfoController(Db8428Context context)
+        public MovieInfoController(IMemoryCache cache)
         {
-            _context = context;
+            _cache = cache;
         }
 
         public IActionResult Details(int id)
         {
-            var movie = _context.Movies
-                .Include(m => m.Director)
-                .Include(m => m.Genres)
-                .Include(m => m.Countries)
-                .FirstOrDefault(m => m.Id == id);
+            if (!_cache.TryGetValue("movies", out List<Movie> movies))
+            {
+                return NotFound("Movies not found in cache.");
+            }
+
+            var movie = movies
+                .Where(m => m.Id == id)
+                .Select(m => new Movie
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    ReleaseDate = m.ReleaseDate,
+                    Director = m.Director,
+                    Genres = m.Genres,
+                    Countries = m.Countries,
+                    Rating = m.Rating,
+                    PosterLink = m.PosterLink
+                })
+                .FirstOrDefault();
 
             if (movie == null)
             {

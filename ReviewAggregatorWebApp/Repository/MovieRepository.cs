@@ -12,6 +12,7 @@ namespace ReviewAggregatorWebApp.Repository
     public class MovieRepository : IAllMovies
     {
         private readonly Db8428Context _context;
+
         public MovieRepository(Db8428Context context)
         {
             _context = context;
@@ -21,6 +22,38 @@ namespace ReviewAggregatorWebApp.Repository
             .Include(x => x.Director)
             .Include(x => x.Genres)
             .Include(x => x.Countries);
+
+        public IEnumerable<Movie> GetFilteredMovies(string filterType, string filterValue)
+        {
+            IEnumerable<Movie> movies = AllMovies;
+
+            switch (filterType.ToLower())
+            {
+                case "genre":
+                    movies = movies.Where(m => m.Genres.Any(g => g.Name == filterValue));
+                    break;
+
+                case "director":
+                    movies = movies.Where(m => m.Director != null && m.Director.Name == filterValue);
+                    break;
+
+                case "country":
+                    movies = movies.Where(m => m.Countries.Any(c => c.Name == filterValue));
+                    break;
+
+                case "year":
+                    if (int.TryParse(filterValue, out int year))
+                    {
+                        movies = movies.Where(m => m.ReleaseDate.Year == year);
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentException("Invalid filter type");
+            }
+
+            return movies;
+        }
 
         public Movie GetById(int id) => _context.Movies
             .Include(x => x.Director)

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ReviewAggregatorWebApp.Middleware.ApiResponseData;
 using ReviewAggregatorWebApp.Interfaces;
 using Microsoft.IdentityModel.Tokens;
+using Azure;
 
 namespace ReviewAggregatorWebApp.Middleware
 {
@@ -23,7 +24,6 @@ namespace ReviewAggregatorWebApp.Middleware
         private readonly InitializationInfo _initInfo;
 
 
-        private const string ApiKey = "PPQ11NW-5GX4PY1-Q7SFRZ1-Q64AJRD";
         private const string BaseUrl = "https://api.kinopoisk.dev";
 
         public DatabaseInitializer(IAllMovies movieRepository, IAllDirectors directorRepository,
@@ -62,8 +62,8 @@ namespace ReviewAggregatorWebApp.Middleware
         public async Task InitializeAsync()
         {
             int startPage = ++_initInfo.LastProcessedPage;
+            if (_initInfo.LastRequestDate.Date != DateTime.Now.Date) _initInfo.RemainingRequests = 195;
             var movieIds = await GetMovieIdsAsync(startPage);
-            if(_initInfo.LastRequestDate.Date != DateTime.Now.Date) _initInfo.RemainingRequests = 195;
          
             foreach (var movieId in movieIds)
             {
@@ -75,7 +75,7 @@ namespace ReviewAggregatorWebApp.Middleware
                     {
                         await SaveMovieAsync(movie);
                     }
-                    catch (Exception) { }
+                    catch (Exception ex) { }
                 }
             }
         }
@@ -84,14 +84,11 @@ namespace ReviewAggregatorWebApp.Middleware
         {
             var movieIds = new List<int>();
             int currentPage = startPage;
-            int endPage = startPage + 3;
+            int endPage = startPage + 1;
 
             do
             {
-                var response = await _httpClient.GetAsync($"{BaseUrl}/v1.4/movie?year=2020&limit=50&page={currentPage}");
-                UpdateInitializationInfo(currentPage, --_initInfo.RemainingRequests, DateTime.Now);
-                response.EnsureSuccessStatusCode();
-                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var jsonResponse = await FetchDataAsync($"{BaseUrl}/v1.4/movie?year=2020&limit=50&page={currentPage}", currentPage);
                 var result = JsonConvert.DeserializeObject<ApiResponse>(jsonResponse);
 
                 movieIds.AddRange(result.Docs.Select(m => m.Id));
@@ -102,8 +99,46 @@ namespace ReviewAggregatorWebApp.Middleware
             return movieIds;
         }
 
+        private async Task<string> FetchDataAsync(string url, int currentpage)
+        {
+            const int maxRetries = 5;
+            int attempt = 0;
+
+            while (attempt < maxRetries)
+            {
+                UpdateInitializationInfo(currentpage, --_initInfo.RemainingRequests, DateTime.Now);
+                attempt++; 
+                using (var cts = new CancellationTokenSource(500))
+                {
+                    
+                    try
+                    {
+                        var response = await _httpClient.GetAsync(url, cts.Token);
+
+                        response.EnsureSuccessStatusCode();
+
+                        var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                        return jsonResponse;
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        Console.WriteLine($"Attempt {attempt + 1}: Request timed out after {500} ms.");
+                    }
+                    catch(HttpRequestException ex) { 
+                        Console.WriteLine(url);
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+            Console.WriteLine(url);
+            throw new Exception("Couldn't complete api request.");
+        }
+
         private void UpdateInitializationInfo(int lastProcessedPage, int remainingRequests, DateTime lastRequestDate)
         {
+            if (remainingRequests == 0) throw new Exception("No requests available");
+
             _initInfo.LastProcessedPage = lastProcessedPage;
             _initInfo.RemainingRequests = remainingRequests;
             _initInfo.LastRequestDate = lastRequestDate;
@@ -122,9 +157,7 @@ namespace ReviewAggregatorWebApp.Middleware
 
         private async Task<MovieDetails> GetMovieDetailsAsync(int movieId)
         {
-            var response = await _httpClient.GetAsync($"{BaseUrl}/v1.4/movie/{movieId}");
-            response.EnsureSuccessStatusCode();
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jsonResponse = await FetchDataAsync($"{BaseUrl}/v1.4/movie/{movieId}", _initInfo.LastProcessedPage);
             return JsonConvert.DeserializeObject<MovieDetails>(jsonResponse);
         }
 
