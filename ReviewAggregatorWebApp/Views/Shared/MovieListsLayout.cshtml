@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "~/Views/Shared/MainLayout.cshtml";
+}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Movie Aggregator</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Genres")">Жанры</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Countries")">Страны</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Years")">Годы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Directors")">Режиссеры</a>
+                </li>
+                <!-- Здесь можно добавить другие кнопки для других списков -->
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    @RenderBody() <!-- Здесь будет отображаться содержимое страницы -->
+</div>

@@ -27,10 +27,18 @@ builder.Services.AddTransient<IAllGenres, GenreRepository>();
 builder.Services.AddTransient<IAllCountries, CountryRepository>();
 builder.Services.AddTransient<IAllMovies, MovieRepository>();
 builder.Services.AddTransient<IAllReviews, ReviewRepository>();
+builder.Services.AddTransient<IAllYears, YearRepository>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddMemoryCache();
-builder.Services.AddSession(); // Добавляем поддержку сессий
+builder.Services.AddSession();
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 
 var app = builder.Build();
 
@@ -57,7 +65,7 @@ app.UseMiddleware<CachingMiddleware>();
 // Использование сессий
 app.UseSession();
 
-var validTableNames = new HashSet<string> { "directors", "countries", "movies" };
+var validTableNames = new HashSet<string> { };
 
 // Middleware для обработки запросов
 app.Use(async (context, next) =>
@@ -227,6 +235,11 @@ app.Use(async (context, next) =>
 app.UseRouting();
 
 app.MapControllerRoute(
+    name: "Index",
+    pattern: "/{action=Index}/{id?}",
+    defaults: new { controller = "Genres" });
+
+app.MapControllerRoute(
     name: "movies",
     pattern: "MoviesList/{action=Index}/{id?}",
     defaults: new { controller = "MoviesList" });
@@ -237,9 +250,24 @@ app.MapControllerRoute(
     defaults: new { controller = "MovieInfo", action = "Details" });
 
 app.MapControllerRoute(
-    name: "genres",
-    pattern: "Genres/{action=Index}/{id?}",
+    name: "Genres",
+    pattern: "genres/{action=Index}/{id?}",
     defaults: new { controller = "Genres" });
+
+app.MapControllerRoute(
+    name: "Countries",
+    pattern: "countries/{action=Index}/{id?}",
+    defaults: new { controller = "Countries" });
+
+app.MapControllerRoute(
+    name: "Years",
+    pattern: "years/{action=Index}/{id?}",
+    defaults: new { controller = "Years" });
+
+app.MapControllerRoute(
+    name: "Directors",
+    pattern: "directors/{action=Index}/{id?}",
+    defaults: new { controller = "Directors" });
 
 app.MapControllerRoute(
     name: "default",

@@ -15,13 +15,24 @@ namespace ReviewAggregatorWebApp.Controllers
             _cache = cache;
         }
 
-        public IActionResult Filter(string filterType, string filterValue)
+        public IActionResult Filter(string filterType, string filterValue, string sortBy)
         {
 
             if (!_cache.TryGetValue("movies", out List<Movie> movies))
             {
                 return NotFound("Movies not found in cache.");
             }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                HttpContext.Session.SetString("SortOrder", sortBy);
+            }
+            else
+            {
+                sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
+            }
+
+            ViewBag.SortOrder = sortBy;
 
             IEnumerable<Movie> filteredMovies = movies;
 
@@ -49,6 +60,16 @@ namespace ReviewAggregatorWebApp.Controllers
 
                 default:
                     return NotFound();
+            }
+
+            switch (sortBy?.ToLower())
+            {
+                case "rating":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.Rating); // Предполагается, что у вас есть свойство Rating
+                    break;
+                case "date":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.ReleaseDate);
+                    break;
             }
 
             return View(filteredMovies);

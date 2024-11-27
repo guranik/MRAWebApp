@@ -20,3 +20,20 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+
+.list-button {
+    width: 900px; /* Ширина кнопки */
+    height: 90px; /* Высота кнопки */
+    background-color: rgba(0, 0, 0, 0); /* Цвет кнопки */
+    color: rgb(0, 0, 0); /* Цвет текста */
+    text-align: left; /* Выравнивание текста по левому краю */
+    padding-left: 20px; /* Отступ слева для текста */
+    border: none; /* Убираем рамку */
+    cursor: pointer; /* Курсор при наведении */
+    transition: background-color 0.3s; /* Плавный переход цвета фона */
+}
+
+    .list-button:hover {
+        background-color: rgb(211, 211, 211); /* Цвет кнопки при наведении (lightgray) */
+    }

@@ -1,0 +1,189 @@
+@model ReviewAggregatorWebApp.Model.Movie
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<h1>@Model.Name</h1>
+<p>
+    Режиссер:
+    @if (Model.Director != null)
+    {
+        <a href="@Url.Action("Filter", "MoviesList", new { filterType = "director", filterValue = Model.Director.Name })">@Model.Director.Name</a>
+    }
+    else
+    {
+        <span>–</span>
+    }
+</p>
+<p>Год премьеры: <a href="@Url.Action("Filter", "MoviesList", new { filterType = "year", filterValue = Model.ReleaseDate.Year })">@Model.ReleaseDate.Year</a></p>
+<p>
+    Страны:
+    @foreach (var country in Model.Countries)
+    {
+        <a href="@Url.Action("Filter", "MoviesList", new { filterType = "country", filterValue = country.Name })">@country.Name</a>
+        @if (country != Model.Countries.Last())
+        {
+            <span>, </span>
+        }
+    }
+</p>
+<p>
+    Жанры:
+    @foreach (var genre in Model.Genres)
+    {
+        <a href="@Url.Action("Filter", "MoviesList", new { filterType = "genre", filterValue = genre.Name })">@genre.Name</a>
+        @if (genre != Model.Genres.Last())
+        {
+            <span>, </span>
+        }
+    }
+</p>
+<p>Рейтинг: @Model.Rating</p>
+<p>Постер: <img src="@Model.PosterLink" alt="@Model.Name" /></p>
+
+Это страница информации о фильме. Каждое поле ссылается на список фильмов отсортированных по указанному параметру.
+Мне нужны контроллеры и представления для списка из таких полей вот пример уже созданного контроллера и представления списка жанров:
+@model IEnumerable<ReviewAggregatorWebApp.Model.Genre>
+
+@{
+    Layout = "~/Views/Shared/MovieListsLayout.cshtml"; // Укажите путь к вашему макету
+}
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<h1>Список жанров</h1>
+
+<ul>
+    @foreach (var genre in Model)
+    {
+        <li>
+            <a href="@Url.Action("Filter", "MoviesList", new { filterType = "genre", filterValue = genre.Name })">
+                @genre.Name
+            </a>
+        </li>
+    }
+</ul>
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Model;
+using System.Collections.Generic;
+
+namespace ReviewAggregatorWebApp.Controllers
+{
+    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
+    public class GenresController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllGenres _genresRepository;
+
+        public GenresController(IMemoryCache cache, IAllGenres genresRepository)
+        {
+            _cache = cache;
+            _genresRepository = genresRepository;
+        }
+
+        public IActionResult Index()
+        {
+            if (!_cache.TryGetValue("genres", out List<Genre> genres))
+            {
+                genres = _genresRepository.AllGenres.ToList();
+
+                _cache.Set("genres", genres, TimeSpan.FromSeconds(256));
+            }
+
+            return View(genres);
+        }
+    }
+}
+Все что есть в странице списка жанров должно быть и в остальных страницах. Вот модель данных:
+using System;
+using System.Collections.Generic;
+
+namespace ReviewAggregatorWebApp.Model;
+public partial class Movie
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public string? PosterLink { get; set; }
+
+    public int? DirectorId { get; set; }
+
+    public DateTime ReleaseDate { get; set; }
+
+    public decimal Rating { get; set; }
+
+    public virtual Director? Director { get; set; }
+
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+    public virtual ICollection<Country> Countries { get; set; } = new List<Country>();
+
+    public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
+
+    public override string ToString()
+    {
+        string Genres = string.Join(", ", this.Genres.Select(obj => obj.ToString()));
+        string Countries = string.Join(", ", this.Countries.Select(obj => obj.ToString()));
+        return $"{Name}: released in {ReleaseDate}, by director: {Director}, has rating: {Rating}. Genres: {Genres}. Countries of action: {Countries}";
+    }
+}
+
+using System;
+using System.Collections.Generic;
+
+namespace ReviewAggregatorWebApp.Model;
+
+public partial class Director
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
+
+    public override string ToString()
+    {
+        return $"{Name}";
+    }
+}
+
+using System;
+using System.Collections.Generic;
+
+namespace ReviewAggregatorWebApp.Model;
+
+public partial class Country
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
+
+    public override string ToString()
+    {
+        return $"{Name}";
+    }
+}
+
+
+using System;
+using System.Collections.Generic;
+
+namespace ReviewAggregatorWebApp.Model;
+
+public partial class Genre
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } = null!;
+
+    public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
+
+    public override string ToString()
+    {
+        return $"{Name}";
+    }
+}

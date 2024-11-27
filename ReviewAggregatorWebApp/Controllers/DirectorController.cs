@@ -8,26 +8,26 @@ using System.Linq;
 namespace ReviewAggregatorWebApp.Controllers
 {
     [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
-    public class CountriesController : Controller
+    public class DirectorsController : Controller
     {
         private readonly IMemoryCache _cache;
-        private readonly IAllCountries _countriesRepository;
+        private readonly IAllDirectors _directorsRepository;
 
-        public CountriesController(IMemoryCache cache, IAllCountries countriesRepository)
+        public DirectorsController(IMemoryCache cache, IAllDirectors directorsRepository)
         {
             _cache = cache;
-            _countriesRepository = countriesRepository;
+            _directorsRepository = directorsRepository;
         }
 
         public IActionResult Index()
         {
-            if (!_cache.TryGetValue("countries", out List<Country> countries))
+            if (!_cache.TryGetValue("directors", out List<Director> directors))
             {
-                countries = _countriesRepository.AllCountries.ToList();
-                _cache.Set("countries", countries, TimeSpan.FromSeconds(256));
+                directors = _directorsRepository.AllDirectors.ToList();
+                _cache.Set("directors", directors, TimeSpan.FromSeconds(256));
             }
 
-            return View(countries);
+            return View(directors);
         }
     }
 }

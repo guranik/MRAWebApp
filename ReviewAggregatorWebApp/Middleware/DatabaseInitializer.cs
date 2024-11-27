@@ -137,7 +137,7 @@ namespace ReviewAggregatorWebApp.Middleware
 
         private void UpdateInitializationInfo(int lastProcessedPage, int remainingRequests, DateTime lastRequestDate)
         {
-            if (remainingRequests == 0) throw new Exception("No requests available");
+            if (remainingRequests == -1) throw new Exception("No requests available");
 
             _initInfo.LastProcessedPage = lastProcessedPage;
             _initInfo.RemainingRequests = remainingRequests;

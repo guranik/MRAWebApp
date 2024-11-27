@@ -32,12 +32,14 @@ namespace ReviewAggregatorWebApp.Middleware
                 var countryRepository = scope.ServiceProvider.GetRequiredService<IAllCountries>();
                 var directorRepository = scope.ServiceProvider.GetRequiredService<IAllDirectors>();
                 var genreRepository = scope.ServiceProvider.GetRequiredService<IAllGenres>();
+                var yearRepository = scope.ServiceProvider.GetRequiredService<IAllYears>();
 
                 // Кэширование данных из каждой таблицы последовательно
-                await CacheData("countries", countryRepository.AllCountries.AsQueryable().Take(20).ToListAsync());
-                await CacheData("directors", directorRepository.AllDirectors.AsQueryable().Take(20).ToListAsync());
-                await CacheData("genres", genreRepository.AllGenres.AsQueryable().Take(20).ToListAsync());
-                await CacheData("movies", movieRepository.AllMovies.AsQueryable().Take(20).ToListAsync());
+                await CacheData("countries", countryRepository.AllCountries.AsQueryable().Take(40).ToListAsync());
+                await CacheData("directors", directorRepository.AllDirectors.AsQueryable().Take(300).ToListAsync());
+                await CacheData("genres", genreRepository.AllGenres.AsQueryable().Take(40).ToListAsync());
+                await CacheData("movies", movieRepository.AllMovies.AsQueryable().Take(500).ToListAsync());
+                await CacheData("years", Task.FromResult(yearRepository.AllYears.ToList()));
             }
 
             await _next(context); // Передаем управление следующему компоненту
@@ -48,7 +50,7 @@ namespace ReviewAggregatorWebApp.Middleware
             if (!_cache.TryGetValue(key, out _))
             {
                 var data = await dataTask;
-                var cacheDuration = TimeSpan.FromSeconds(256); // N - номер варианта
+                var cacheDuration = TimeSpan.FromSeconds(256);
                 _cache.Set(key, data, cacheDuration);
             }
         }
