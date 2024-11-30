@@ -18,6 +18,55 @@
         .nav-link {
             padding-right: 15px; /* Отступ между элементами навигации */
         }
+
+        .list-button {
+            width: 900px; /* Ширина кнопки */
+            height: 90px; /* Высота кнопки */
+            background-color: rgba(0, 0, 0, 0); /* Цвет кнопки */
+            color: rgb(0, 0, 0); /* Цвет текста */
+            align-items: center; /* Вертикальное выравнивание по центру */
+
+            text-align: left; /* Выравнивание текста по левому краю */
+            padding-left: 20px; /* Отступ слева для текста */
+            border: none; /* Убираем рамку */
+            cursor: pointer; /* Курсор при наведении */
+            transition: background-color 0.2s; /* Плавный переход цвета фона */
+            text-decoration: none; /* Убираем подчеркивание текста */
+        }
+
+            .list-button:hover {
+                background-color: rgb(235, 235, 235); /* Цвет кнопки при наведении (lightgray) */
+                color: rgb(0, 0, 0); /* Цвет текста */
+            }
+
+            .list-button.active {
+                background-color: rgb(235, 235, 235) !important; /* Цвет кнопки при активации (lightgray) */
+                color: rgb(0, 0, 0) !important; /* Цвет текста */
+            }
+
+        .movie-item {
+            width: 900px;
+            height: 160px;
+            background-color: white;
+            margin: 10px 0; /* Отступ между элементами списка */
+            transition: background-color 0.3s; /* Плавный переход цвета фона */
+            overflow: hidden; /* Скрыть переполнение */
+        }
+
+            .movie-item:hover {
+                background-color: lightgray; /* Цвет при наведении */
+            }
+
+        .movie-info {
+            padding: 10px; /* Отступы внутри блока */
+        }
+
+        .movie-link {
+            display: inline-block; /* Делаем ссылку блочной для управления шириной */
+            width: 40%; /* Ширина ссылки 40% от родительского блока */
+            text-decoration: none; /* Убираем подчеркивание */
+            color: black; /* Цвет текста */
+        }
     </style>
     <title>Movie Review Aggregator</title>
     <link href="~/css/site.css" rel="stylesheet" type="text/css">
@@ -26,7 +75,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top">
             <div class="container-fluid">
-                <a class="navbar-brand" href="@Url.Action("Index", "Home")">Главная</a>
+                <a class="navbar-brand" href="@Url.Action("Index", "Genres")">Главная</a>
                 <div class="d-flex align-items-center">
                     <input type="text" class="form-control me-2" placeholder="Найти фильм" aria-label="Search">
                     <button class="btn btn-outline-success" type="button">Войти</button>

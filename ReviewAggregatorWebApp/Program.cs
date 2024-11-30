@@ -235,14 +235,10 @@ app.Use(async (context, next) =>
 app.UseRouting();
 
 app.MapControllerRoute(
-    name: "Index",
-    pattern: "/{action=Index}/{id?}",
-    defaults: new { controller = "Genres" });
-
-app.MapControllerRoute(
-    name: "movies",
-    pattern: "MoviesList/{action=Index}/{id?}",
-    defaults: new { controller = "MoviesList" });
+    name: "Filter",
+    pattern: "Filter/{genre?}/{year?}/{director?}/{country?}/{sortBy?}",
+    defaults: new { controller = "MoviesList", action = "Filter" }
+);
 
 app.MapControllerRoute(
     name: "movieDetails",
@@ -250,14 +246,14 @@ app.MapControllerRoute(
     defaults: new { controller = "MovieInfo", action = "Details" });
 
 app.MapControllerRoute(
-    name: "Genres",
-    pattern: "genres/{action=Index}/{id?}",
-    defaults: new { controller = "Genres" });
-
-app.MapControllerRoute(
     name: "Countries",
     pattern: "countries/{action=Index}/{id?}",
     defaults: new { controller = "Countries" });
+
+app.MapControllerRoute(
+    name: "Genres",
+    pattern: "genres/{action=Index}/{id?}",
+    defaults: new { controller = "Genres" });
 
 app.MapControllerRoute(
     name: "Years",
@@ -271,6 +267,6 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Genres}/{action=Index}/{id?}");
 
 app.Run();

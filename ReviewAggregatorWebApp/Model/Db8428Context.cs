@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace ReviewAggregatorWebApp.Model;
 
-public partial class Db8428Context : DbContext
+public partial class Db8428Context : IdentityDbContext<User, IdentityRole<int>, int>
 {
     public Db8428Context()
     {
@@ -25,8 +27,6 @@ public partial class Db8428Context : DbContext
     public virtual DbSet<Movie> Movies { get; set; }
 
     public virtual DbSet<Review> Reviews { get; set; }
-
-    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -65,6 +65,7 @@ public partial class Db8428Context : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Country>(entity =>
         {

@@ -1,22 +1,83 @@
 ﻿@model IEnumerable<ReviewAggregatorWebApp.Model.Movie>
 @{
-    var filterType = Context.Request.Query["filterType"];
-    var filterValue = Context.Request.Query["filterValue"];
+    var genre = ViewBag.Genre;
+    var year = ViewBag.Year;
+    var director = ViewBag.Director;
+    var country = ViewBag.Country;
     var sortOrder = ViewBag.SortOrder;
+
+    // Получаем данные для фильтров из кэша
+    var genres = ViewBag.Genres;
+    var years = ViewBag.Years;
+    var directors = ViewBag.Directors;
+    var countries = ViewBag.Countries;
+
+    // Формируем заголовок страницы
+    string genreTitle = string.IsNullOrEmpty(genre) ? "" : $" жанра {genre}";
+    string yearTitle = string.IsNullOrEmpty(year) ? "" : $" {year} года";
+    string directorTitle = string.IsNullOrEmpty(director) ? "" : $" режиссера {director}";
+    string countryTitle = string.IsNullOrEmpty(country) ? "" : $", созданные в стране {country}";
+
     Layout = "~/Views/Shared/MainLayout.cshtml";
 }
 
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-</head>
+<h1>Фильмы@(genreTitle + yearTitle + directorTitle + countryTitle)</h1>
 
-<h1>@ViewBag.FilterTitle</h1>
+<div class="filter-section">
+    <form method="get" action="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder })">
+        <div class="form-group">
+            <label for="genre">Жанр:</label>
+            <select id="genre" name="genre" class="form-control">
+                <option value="">Все</option>
+                @foreach (var g in genres)
+                {
+                    <option value="@g" selected="@(g.ToString() == genre ? "selected" : null)">@g</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="year">Год выхода:</label>
+            <select id="year" name="year" class="form-control">
+                <option value="">Все</option>
+                @foreach (var y in years)
+                {
+                    <option value="@y" selected="@(y.ToString() == year ? "selected" : null)">@y</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="director">Режиссер:</label>
+            <select id="director" name="director" class="form-control">
+                <option value="">Все</option>
+                @foreach (var d in directors)
+                {
+                    <option value="@d" selected="@(d.ToString() == director ? "selected" : null)">@d</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Страна:</label>
+            <select id="country" name="country" class="form-control">
+                <option value="">Все</option>
+                @foreach (var c in countries)
+                {
+                    <option value="@c" selected="@(c.ToString() == country ? "selected" : null)">@c</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+    </form>
+</div>
 
 <div class="form-group">
     <label for="sortOptions">Сортировать по:</label>
     <select id="sortOptions" class="form-control" onchange="location = this.value;">
-        <option value="@Url.Action("Filter", new { filterType = filterType, filterValue = filterValue, sortBy = "rating" })" @(sortOrder == "rating" ? "selected" : "")>По рейтингу</option>
-        <option value="@Url.Action("Filter", new { filterType = filterType, filterValue = filterValue, sortBy = "date" })" @(sortOrder == "date" ? "selected" : "")>По дате</option>
+        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "rating" })" selected="@(sortOrder == "rating" ? "selected" : null)">По рейтингу</option>
+        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "date" })" selected="@(sortOrder == "date" ? "selected" : null)">По дате</option>
     </select>
 </div>
 
@@ -25,18 +86,20 @@
     <ul>
         @foreach (var movie in Model)
         {
-            <li>
-                <strong>
-                    <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })">
-                        @movie.Name
+            <li class="movie-item">
+                <div class="movie-info">
+                    <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })" class="movie-link">
+                        <strong>
+                            @movie.Name
+                        </strong> - @(movie.ReleaseDate.Year.ToString())
+                        <br />
+                        Жанры: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
+                        <br />
+                        Режиссер: @(movie.Director?.Name ?? "–")
+                        <br />
+                        Страны: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
                     </a>
-                </strong> - @(movie.ReleaseDate.Year.ToString())
-                <br />
-                Жанры: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
-                <br />
-                Режиссер: @(movie.Director?.Name ?? "–")
-                <br />
-                Страны: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
+                </div>
             </li>
         }
     </ul>

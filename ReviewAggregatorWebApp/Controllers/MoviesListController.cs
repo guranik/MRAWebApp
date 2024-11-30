@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.Model;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace ReviewAggregatorWebApp.Controllers
@@ -15,12 +18,32 @@ namespace ReviewAggregatorWebApp.Controllers
             _cache = cache;
         }
 
-        public IActionResult Filter(string filterType, string filterValue, string sortBy)
+        public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating")
         {
-
-            if (!_cache.TryGetValue("movies", out List<Movie> movies))
+            if (!_cache.TryGetValue("movies", out List<Movie>
+            movies))
             {
                 return NotFound("Movies not found in cache.");
+            }
+            if (!_cache.TryGetValue("genres", out List<Genre>
+            genres))
+            {
+                return NotFound("Genres not found in cache.");
+            }
+            if (!_cache.TryGetValue("countries", out List<Country>
+            countries))
+            {
+                return NotFound("Countries not found in cache.");
+            }
+            if (!_cache.TryGetValue("directors", out List<Director>
+            directors))
+            {
+                return NotFound("Directors not found in cache.");
+            }
+            if (!_cache.TryGetValue("years", out List<int>
+            years))
+            {
+                return NotFound("Years not found in cache.");
             }
 
             if (!string.IsNullOrEmpty(sortBy))
@@ -34,45 +57,52 @@ namespace ReviewAggregatorWebApp.Controllers
 
             ViewBag.SortOrder = sortBy;
 
-            IEnumerable<Movie> filteredMovies = movies;
+            IEnumerable<Movie>
+                filteredMovies = movies;
 
-            switch (filterType.ToLower())
+            if (!string.IsNullOrEmpty(genre))
             {
-                case "genre":
-                    filteredMovies = movies.Where(m => m.Genres.Any(g => g.Name == filterValue));
-                    ViewBag.FilterTitle = $"Фильмы жанра {filterValue}";
-                    break;
+                filteredMovies = filteredMovies.Where(m => m.Genres.Any(g => g.Name == genre));
+            }
 
-                case "director":
-                    filteredMovies = movies.Where(m => m.Director != null && m.Director.Name == filterValue);
-                    ViewBag.FilterTitle = $"Фильмы режиссера {filterValue}";
-                    break;
+            if (!string.IsNullOrEmpty(director))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Director != null && m.Director.Name == director);
+            }
 
-                case "country":
-                    filteredMovies = movies.Where(m => m.Countries.Any(c => c.Name == filterValue));
-                    ViewBag.FilterTitle = $"Фильмы страны {filterValue}";
-                    break;
+            if (!string.IsNullOrEmpty(country))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Countries.Any(c => c.Name == country));
+            }
 
-                case "year":
-                    filteredMovies = movies.Where(m => m.ReleaseDate.Year.ToString() == filterValue);
-                    ViewBag.FilterTitle = $"Фильмы {filterValue} года";
-                    break;
-
-                default:
-                    return NotFound();
+            if (!string.IsNullOrEmpty(year))
+            {
+                filteredMovies = filteredMovies.Where(m => m.ReleaseDate.Year.ToString() == year);
             }
 
             switch (sortBy?.ToLower())
             {
                 case "rating":
-                    filteredMovies = filteredMovies.OrderByDescending(m => m.Rating); // Предполагается, что у вас есть свойство Rating
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.Rating);
                     break;
                 case "date":
                     filteredMovies = filteredMovies.OrderByDescending(m => m.ReleaseDate);
                     break;
             }
 
+            // Передаем данные для фильтров в представление
+            ViewBag.Genres = genres;
+            ViewBag.Years = years;
+            ViewBag.Directors = directors;
+            ViewBag.Countries = countries;
+
+            ViewBag.Year = year;
+            ViewBag.Country = country;
+            ViewBag.Director = director;
+            ViewBag.Genre = genre;
+
             return View(filteredMovies);
         }
+
     }
 }
