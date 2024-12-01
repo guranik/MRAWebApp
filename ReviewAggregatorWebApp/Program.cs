@@ -12,6 +12,7 @@ using ReviewAggregatorWebApp.Repository;
 using Microsoft.Extensions.Configuration;
 using ReviewAggregatorWebApp.Middleware.ApiResponseData;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,17 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<Db8428Context>()
+.AddDefaultTokenProviders();
 
 
 var app = builder.Build();
@@ -61,6 +73,11 @@ using (var scope = app.Services.CreateScope())
 
 // Использование middleware для кэширования
 app.UseMiddleware<CachingMiddleware>();
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseStaticFiles();
 
 // Использование сессий
 app.UseSession();
