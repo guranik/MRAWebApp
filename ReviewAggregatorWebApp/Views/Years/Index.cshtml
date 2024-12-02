@@ -1,15 +1,17 @@
 ﻿@model IEnumerable<int>
 
 @{
-    Layout = "~/Views/Shared/MovieFiltersLayout.cshtml"; // Укажите путь к вашему макету
+    Layout = "~/Views/Shared/MovieFiltersLayout.cshtml";
 }
 <h1>Список годов</h1>
 
 <div class="d-flex flex-column align-items-center">
     @foreach (var year in Model)
     {
-        <a href="@Url.Action("Filter", "MoviesList", new { year = year, sortBy = "rating" })" class="list-button" )">
+        <div class="genre-item list-button d-flex align-items-center"
+             style="width: 100%; cursor: pointer;"
+             onclick="location.href='@Url.Action("Filter", "MoviesList", new { year = year })';">
             @year
-        </a>
+        </div>
     }
 </div>

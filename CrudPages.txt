@@ -1,0 +1,792 @@
+Это представление страницы изменения объекта фильма с выпадающими списками выбора нескольких значений. 
+@model ReviewAggregatorWebApp.Model.Movie
+@{
+        Layout = "~/Views/Shared/MainLayout.cshtml";
+}
+<h1>Редактировать фильм</h1>
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PosterLink"></label>
+        <input asp-for="PosterLink" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="DirectorId"></label>
+        <select asp-for="DirectorId" class="form-control" asp-items="@(new SelectList(ViewBag.Directors, "Id", "Name", Model.DirectorId))"></select>
+        <span asp-validation-for="DirectorId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ReleaseDate"></label>
+        <input asp-for="ReleaseDate" class="form-control" type="date" />
+        <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Rating"></label>
+        <input asp-for="Rating" class="form-control" />
+        <span asp-validation-for="Rating" class="text-danger"></span>
+    </div>
+    <div class="multiselect">
+        <div class="selectBox" onclick="showCheckboxes('countryCheckboxes')">
+            <select class="form-select">
+                <option>Страны фильма</option>
+            </select>
+            <div class="overSelect"></div>
+        </div>
+        <div class=" dropdown-menu checkboxes countryCheckboxes">
+            @foreach (var country in ViewBag.Countries)
+            {
+                <div class="form-check">
+                    <label for="country_@country.Id" class="form-check-label">
+                        <input type="checkbox" name="selectedCountries[]"  
+                            checked="@(Model.Countries.Any(c => c.Id == country.Id) ? "checked" : null)"
+                               id="@country.Id" class="form-check-input" value="@country.Id" />@country.Name
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="multiselect">
+        <div class="selectBox" onclick="showCheckboxes('genreCheckboxes')">
+            <select class="form-select">
+                <option>Жанры фильма</option>
+            </select>
+            <div class="overSelect"></div>
+        </div>
+        <div class="dropdown-menu checkboxes genreCheckboxes">
+            @foreach (var genre in ViewBag.Genres)
+            {
+                <div class="form-check">
+                    <label for="genre_@genre.Id" class="form-check-label">
+                        <input type="checkbox" name="selectedGenres[]" 
+                            checked="@(Model.Genres.Any(g => g.Id == genre.Id) ? "checked" : null)"
+                               id="@genre.Id" class="form-check-input" value="@genre.Id" />@genre.Name
+                    </label>
+                </div>
+            }
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+</form>
+
+<script>
+    var expanded = false;
+
+    function showCheckboxes(checkboxesClass) {
+        var checkboxes = document.querySelector('.' + checkboxesClass);
+        if (checkboxes.style.display === "block") {
+            checkboxes.style.display = "none";
+        } else {
+            checkboxes.style.display = "block";
+        }
+    }
+</script>
+
+Вот контроллер списка фильмов:
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Model;
+using ReviewAggregatorWebApp.Repository;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+
+namespace ReviewAggregatorWebApp.Controllers
+{
+    public class MoviesListController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllMovies _moviesRepository;
+        private readonly IAllCountries _countriesRepository;
+        private readonly IAllGenres _genresRepository;
+        private readonly IAllDirectors _directorsRepository;
+
+        public MoviesListController(
+            IMemoryCache cache, IAllMovies moviesRepository, 
+            IAllCountries countriesRepository, IAllGenres genresRepository, 
+            IAllDirectors directorsRepository)
+        {
+            _cache = cache;
+            _moviesRepository = moviesRepository;
+            _countriesRepository = countriesRepository;
+            _genresRepository = genresRepository;
+            _directorsRepository = directorsRepository;
+        }
+
+        public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating")
+        {
+            if (!_cache.TryGetValue("movies", out List<Movie>
+            movies))
+            {
+                return NotFound("Movies not found in cache.");
+            }
+            if (!_cache.TryGetValue("genres", out List<Genre>
+            genres))
+            {
+                return NotFound("Genres not found in cache.");
+            }
+            if (!_cache.TryGetValue("countries", out List<Country>
+            countries))
+            {
+                return NotFound("Countries not found in cache.");
+            }
+            if (!_cache.TryGetValue("directors", out List<Director>
+            directors))
+            {
+                return NotFound("Directors not found in cache.");
+            }
+            if (!_cache.TryGetValue("years", out List<int>
+            years))
+            {
+                return NotFound("Years not found in cache.");
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                HttpContext.Session.SetString("SortOrder", sortBy);
+            }
+            else
+            {
+                sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
+            }
+
+            ViewBag.SortOrder = sortBy;
+
+            IEnumerable<Movie>
+                filteredMovies = movies;
+
+            if (!string.IsNullOrEmpty(genre))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Genres.Any(g => g.Name == genre));
+            }
+
+            if (!string.IsNullOrEmpty(director))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Director != null && m.Director.Name == director);
+            }
+
+            if (!string.IsNullOrEmpty(country))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Countries.Any(c => c.Name == country));
+            }
+
+            if (!string.IsNullOrEmpty(year))
+            {
+                filteredMovies = filteredMovies.Where(m => m.ReleaseDate.Year.ToString() == year);
+            }
+
+            switch (sortBy?.ToLower())
+            {
+                case "rating":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.Rating);
+                    break;
+                case "date":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.ReleaseDate);
+                    break;
+            }
+
+            // Передаем данные для фильтров в представление
+            ViewBag.Genres = genres;
+            ViewBag.Years = years;
+            ViewBag.Directors = directors;
+            ViewBag.Countries = countries;
+
+            ViewBag.Year = year;
+            ViewBag.Country = country;
+            ViewBag.Director = director;
+            ViewBag.Genre = genre;
+
+            return View(filteredMovies);
+        }
+
+        public IActionResult Create()
+        {
+            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
+            ViewBag.Genres = _genresRepository.AllGenres.ToList();
+            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Movie movie, int[] selectedCountries, int[] selectedGenres)
+        {
+            if (ModelState.IsValid)
+            {
+                // Добавление выбранных стран и жанров
+                if (selectedCountries != null)
+                {
+                    movie.Countries = selectedCountries.Select(id => _countriesRepository.GetById(id)).ToList();
+                }
+                if (selectedGenres != null)
+                {
+                    movie.Genres = selectedGenres.Select(id => _genresRepository.GetById(id)).ToList();
+                }
+
+                if (!movie.Countries.Any() || !movie.Genres.Any())
+                {
+                    ModelState.AddModelError("", "Фильм должен иметь хотя бы одну страну и один жанр.");
+                    ViewBag.Countries = _countriesRepository.AllCountries.ToList();
+                    ViewBag.Genres = _genresRepository.AllGenres.ToList();
+                    ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
+                    return View(movie);
+                }
+
+                _moviesRepository.Create(movie);
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
+            ViewBag.Genres = _genresRepository.AllGenres.ToList();
+            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
+            return View(movie);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var movie = _moviesRepository.GetById(id);
+            if (movie == null) return NotFound();
+
+            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
+            ViewBag.Genres = _genresRepository.AllGenres.ToList();
+            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
+            return View(movie);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Movie movie, int[] selectedCountries, int[] selectedGenres)
+        {
+            if (ModelState.IsValid)
+            {
+                // Получаем существующий фильм из базы данных
+                var existingMovie = _moviesRepository.GetById(movie.Id);
+
+                // Обновляем свойства
+                existingMovie.Name = movie.Name;
+                existingMovie.PosterLink = movie.PosterLink;
+                existingMovie.DirectorId = movie.DirectorId;
+                existingMovie.ReleaseDate = movie.ReleaseDate;
+                existingMovie.Rating = movie.Rating;
+
+                // Обновление выбранных стран
+                if (selectedCountries != null)
+                {
+                    existingMovie.Countries = selectedCountries.Select(id => _countriesRepository.GetById(id)).ToList();
+                }
+                else
+                {
+                    existingMovie.Countries.Clear(); // Если страны не выбраны, очищаем
+                }
+
+                // Обновление выбранных жанров
+                if (selectedGenres != null)
+                {
+                    existingMovie.Genres = selectedGenres.Select(id => _genresRepository.GetById(id)).ToList();
+                }
+                else
+                {
+                    existingMovie.Genres.Clear(); // Если жанры не выбраны, очищаем
+                }
+
+                if (!existingMovie.Countries.Any() || !existingMovie.Genres.Any())
+                {
+                    ModelState.AddModelError("", "Фильм должен иметь хотя бы одну страну и один жанр.");
+                    ViewBag.Countries = _countriesRepository.AllCountries.ToList();
+                    ViewBag.Genres = _genresRepository.AllGenres.ToList();
+                    ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
+                    return View(movie);
+                }
+
+                _moviesRepository.Update(existingMovie);
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
+            ViewBag.Genres = _genresRepository.AllGenres.ToList();
+            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
+            return View(movie);
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var movie = _moviesRepository.GetById(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            _moviesRepository.Delete(movie);
+            return RedirectToAction("Index");
+        }
+    }
+}
+
+Нужно создать еще страницу создания фильма, создания и изменения стран и режиссеров. Я хочу чтобы у каждого объекта был свой набор полей которые можно изменять в виде модели представления. В комбинации с частичными представлениями это должно обеспечить переиспользование кода. Напиши, как это можно сделать, оставив html структуру и параметры html тегов - для меня это важно, так как с помощью стилей css и html структуры да и еще с использованием js был создан выпадающий список множественного выбора стран и жанров. 
+
+Модели и модели представлений фильмов, стран и режиссеров:
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace ReviewAggregatorWebApp.Model;
+
+public partial class Country
+{
+    public int Id { get; set; }
+
+    [Required(ErrorMessage = "Название страны обязательно для заполнения.")]
+    public string Name { get; set; } = null!;
+
+    public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
+
+    public override string ToString()
+    {
+        return $"{Name}";
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace ReviewAggregatorWebApp.Model;
+
+public partial class Director
+{
+    public int Id { get; set; }
+
+    [Required(ErrorMessage = "Имя режиссера обязательно для заполнения.")]
+    public string Name { get; set; } = null!;
+
+    public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
+
+    public override string ToString()
+    {
+        return $"{Name}";
+    }
+}
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace ReviewAggregatorWebApp.Model;
+public partial class Movie
+{
+    public int Id { get; set; }
+
+    [Required(ErrorMessage = "Название фильма обязательно для заполнения.")]
+    public string Name { get; set; } = null!;
+
+    public string? PosterLink { get; set; }
+
+    [Required(ErrorMessage = "Выберите режиссера.")]
+    public int? DirectorId { get; set; }
+
+    [Required(ErrorMessage = "Дата выпуска обязательна для заполнения.")]
+    [DataType(DataType.Date)]
+    public DateTime ReleaseDate { get; set; }
+
+    [Required(ErrorMessage = "Рейтинг обязателен для заполнения.")]
+    [Range(0, 10, ErrorMessage = "Рейтинг должен быть в диапазоне от 0 до 10.")]
+    public decimal Rating { get; set; }
+
+    public virtual Director? Director { get; set; }
+
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+    public virtual ICollection<Country> Countries { get; set; } = new List<Country>();
+
+    public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
+
+    public override string ToString()
+    {
+        string Genres = string.Join(", ", this.Genres.Select(obj => obj.ToString()));
+        string Countries = string.Join(", ", this.Countries.Select(obj => obj.ToString()));
+        return $"{Name}: released in {ReleaseDate}, by director: {Director}, has rating: {Rating}. Genres: {Genres}. Countries of action: {Countries}";
+    }
+}
+
+namespace ReviewAggregatorWebApp.ViewModel
+{
+    public class CountryViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public bool IsEditing { get; set; }
+    }
+}
+namespace ReviewAggregatorWebApp.ViewModel
+{
+    public class DirectorViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public bool IsEditing { get; set; }
+    }
+}
+
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace ReviewAggregatorWebApp.ViewModel
+{
+    public class MovieViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string? PosterLink { get; set; }
+        public int? DirectorId { get; set; }
+        public DateTime ReleaseDate { get; set; }
+        public decimal Rating { get; set; }
+        public List<int> GenreIds { get; set; } = new List<int>(); // Используем IDs жанров
+        public List<int> CountryIds { get; set; } = new List<int>(); // Используем IDs стран
+        public bool IsEditing { get; set; }
+
+        // Для отображения в Select списках
+        public IEnumerable<SelectListItem> Directors { get; set; }
+        public IEnumerable<SelectListItem> Genres { get; set; }
+        public IEnumerable<SelectListItem> Countries { get; set; }
+
+    }
+}
+
+
+Представления и контроллеры страниц списков данных объектов:
+@model IEnumerable<ReviewAggregatorWebApp.Model.Country>
+
+@{
+    Layout = "~/Views/Shared/MovieFiltersLayout.cshtml";
+}
+<h1>Список стран</h1>
+
+<div class="d-flex flex-column align-items-center">
+    @foreach (var country in Model)
+    {
+        <a href="@Url.Action("Filter", "MoviesList", new { genre = "", year = "", director = "", country = country.Name, sortBy = "rating" })" class="list-button" )">
+            @country.Name
+        </a>
+    }
+</div>
+
+@model IEnumerable<ReviewAggregatorWebApp.Model.Director>
+
+@{
+    Layout = "~/Views/Shared/MovieFiltersLayout.cshtml";
+}
+<h1>Список режиссеров</h1>
+
+<div class="d-flex flex-column align-items-center">
+    @foreach (var director in Model)
+    {
+        <a href="@Url.Action("Filter", "MoviesList", new { director = director.Name, sortBy = "rating" })" class="list-button" )">
+            @director.Name
+        </a>
+    }
+</div>
+
+@model IEnumerable<ReviewAggregatorWebApp.Model.Movie>
+@{
+    var genre = ViewBag.Genre;
+    var year = ViewBag.Year;
+    var director = ViewBag.Director;
+    var country = ViewBag.Country;
+    var sortOrder = ViewBag.SortOrder;
+
+    // Получаем данные для фильтров из кэша
+    var genres = ViewBag.Genres;
+    var years = ViewBag.Years;
+    var directors = ViewBag.Directors;
+    var countries = ViewBag.Countries;
+
+    // Формируем заголовок страницы
+    string genreTitle = string.IsNullOrEmpty(genre) ? "" : $" жанра {genre}";
+    string yearTitle = string.IsNullOrEmpty(year) ? "" : $" {year} года";
+    string directorTitle = string.IsNullOrEmpty(director) ? "" : $" режиссера {director}";
+    string countryTitle = string.IsNullOrEmpty(country) ? "" : $", созданные в стране {country}";
+
+    Layout = "~/Views/Shared/MainLayout.cshtml";
+}
+
+<h1>Фильмы@(genreTitle + yearTitle + directorTitle + countryTitle)</h1>
+
+<div class="filter-section">
+    <form method="get" action="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder })">
+        <div class="form-group">
+            <label for="genre">Жанр:</label>
+            <select id="genre" name="genre" class="form-control">
+                <option value="">Все</option>
+                @foreach (var g in genres)
+                {
+                    <option value="@g" selected="@(g.ToString() == genre ? "selected" : null)">@g</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="year">Год выхода:</label>
+            <select id="year" name="year" class="form-control">
+                <option value="">Все</option>
+                @foreach (var y in years)
+                {
+                    <option value="@y" selected="@(y.ToString() == year ? "selected" : null)">@y</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="director">Режиссер:</label>
+            <select id="director" name="director" class="form-control">
+                <option value="">Все</option>
+                @foreach (var d in directors)
+                {
+                    <option value="@d" selected="@(d.ToString() == director ? "selected" : null)">@d</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Страна:</label>
+            <select id="country" name="country" class="form-control">
+                <option value="">Все</option>
+                @foreach (var c in countries)
+                {
+                    <option value="@c" selected="@(c.ToString() == country ? "selected" : null)">@c</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+    </form>
+</div>
+
+<div class="form-group">
+    <label for="sortOptions">Сортировать по:</label>
+    <select id="sortOptions" class="form-control" onchange="location = this.value;">
+        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "rating" })" selected="@(sortOrder == "rating" ? "selected" : null)">По рейтингу</option>
+        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "date" })" selected="@(sortOrder == "date" ? "selected" : null)">По дате</option>
+    </select>
+</div>
+
+<div>
+    <a asp-action="Create" class="btn btn-primary">Добавить фильм</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <ul>
+        @foreach (var movie in Model)
+        {
+            <li class="movie-item">
+                <div class="movie-info">
+                    <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })" class="movie-link">
+                        <strong>
+                            @movie.Name
+                        </strong> - @(movie.ReleaseDate.Year.ToString())
+                        <br />
+                        Жанры: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
+                        <br />
+                        Режиссер: @(movie.Director?.Name ?? "–")
+                        <br />
+                        Страны: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
+                    </a>
+
+                    <div>
+                        <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary">Изменить</a>
+                        <button class="btn btn-danger" onclick="confirmDelete(@movie.Id)">Удалить</button>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Фильмы не найдены.</p>
+}
+
+<script>
+    function confirmDelete(movieId) {
+        if (confirm("Вы уверены, что хотите удалить этот фильм?")) {
+            window.location.href = '@Url.Action("Delete")/' + movieId;
+        }
+    }
+</script>
+
+Контроллер стран:
+namespace ReviewAggregatorWebApp.Controllers
+{
+    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
+    public class CountriesController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllCountries _countriesRepository;
+
+        public CountriesController(IMemoryCache cache, IAllCountries countriesRepository)
+        {
+            _cache = cache;
+            _countriesRepository = countriesRepository;
+        }
+
+        public IActionResult Index()
+        {
+            if (!_cache.TryGetValue("countries", out List<Country> countries))
+            {
+                countries = _countriesRepository.AllCountries.ToList();
+                _cache.Set("countries", countries, TimeSpan.FromSeconds(256));
+            }
+
+            return View(countries);
+        }
+}
+}
+
+Контроллер режиссеров:
+
+namespace ReviewAggregatorWebApp.Controllers
+{
+    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
+    public class DirectorsController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllDirectors _directorsRepository;
+
+        public DirectorsController(IMemoryCache cache, IAllDirectors directorsRepository)
+        {
+            _cache = cache;
+            _directorsRepository = directorsRepository;
+        }
+
+        public IActionResult Index()
+        {
+            if (!_cache.TryGetValue("directors", out List<Director> directors))
+            {
+                directors = _directorsRepository.AllDirectors.ToList();
+                _cache.Set("directors", directors, TimeSpan.FromSeconds(256));
+            }
+
+            return View(directors);
+        }
+}
+}
+
+Контроллер фильмов:
+
+namespace ReviewAggregatorWebApp.Controllers
+{
+    public class MoviesListController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllMovies _moviesRepository;
+        private readonly IAllCountries _countriesRepository;
+        private readonly IAllGenres _genresRepository;
+        private readonly IAllDirectors _directorsRepository;
+
+        public MoviesListController(
+            IMemoryCache cache, IAllMovies moviesRepository, 
+            IAllCountries countriesRepository, IAllGenres genresRepository, 
+            IAllDirectors directorsRepository)
+        {
+            _cache = cache;
+            _moviesRepository = moviesRepository;
+            _countriesRepository = countriesRepository;
+            _genresRepository = genresRepository;
+            _directorsRepository = directorsRepository;
+        }
+
+        public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating")
+        {
+            if (!_cache.TryGetValue("movies", out List<Movie>
+            movies))
+            {
+                return NotFound("Movies not found in cache.");
+            }
+            if (!_cache.TryGetValue("genres", out List<Genre>
+            genres))
+            {
+                return NotFound("Genres not found in cache.");
+            }
+            if (!_cache.TryGetValue("countries", out List<Country>
+            countries))
+            {
+                return NotFound("Countries not found in cache.");
+            }
+            if (!_cache.TryGetValue("directors", out List<Director>
+            directors))
+            {
+                return NotFound("Directors not found in cache.");
+            }
+            if (!_cache.TryGetValue("years", out List<int>
+            years))
+            {
+                return NotFound("Years not found in cache.");
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                HttpContext.Session.SetString("SortOrder", sortBy);
+            }
+            else
+            {
+                sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
+            }
+
+            ViewBag.SortOrder = sortBy;
+
+            IEnumerable<Movie>
+                filteredMovies = movies;
+
+            if (!string.IsNullOrEmpty(genre))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Genres.Any(g => g.Name == genre));
+            }
+
+            if (!string.IsNullOrEmpty(director))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Director != null && m.Director.Name == director);
+            }
+
+            if (!string.IsNullOrEmpty(country))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Countries.Any(c => c.Name == country));
+            }
+
+            if (!string.IsNullOrEmpty(year))
+            {
+                filteredMovies = filteredMovies.Where(m => m.ReleaseDate.Year.ToString() == year);
+            }
+
+            switch (sortBy?.ToLower())
+            {
+                case "rating":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.Rating);
+                    break;
+                case "date":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.ReleaseDate);
+                    break;
+            }
+
+            // Передаем данные для фильтров в представление
+            ViewBag.Genres = genres;
+            ViewBag.Years = years;
+            ViewBag.Directors = directors;
+            ViewBag.Countries = countries;
+
+            ViewBag.Year = year;
+            ViewBag.Country = country;
+            ViewBag.Director = director;
+            ViewBag.Genre = genre;
+
+            return View(filteredMovies);
+        }
+}
+}

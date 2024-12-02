@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
+using ReviewAggregatorWebApp.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,36 +33,43 @@ namespace ReviewAggregatorWebApp.Controllers
 
         public IActionResult Create()
         {
-            return View();
+            return View(new DirectorViewModel());
         }
 
         [HttpPost]
-        public IActionResult Create(Director director)
+        public IActionResult Create(DirectorViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var director = new Director { Name = model.Name };
                 _directorsRepository.Create(director);
                 return RedirectToAction("Index");
             }
-            return View(director);
+            return View(model);
         }
 
         public IActionResult Edit(int id)
         {
             var director = _directorsRepository.GetById(id);
             if (director == null) return NotFound();
-            return View(director);
+
+            var model = new DirectorViewModel { Id = director.Id, Name = director.Name, IsEditing = true };
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult Edit(Director director)
+        public IActionResult Edit(DirectorViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var director = _directorsRepository.GetById(model.Id);
+                if (director == null) return NotFound();
+
+                director.Name = model.Name;
                 _directorsRepository.Update(director);
                 return RedirectToAction("Index");
             }
-            return View(director);
+            return View(model);
         }
     }
 }

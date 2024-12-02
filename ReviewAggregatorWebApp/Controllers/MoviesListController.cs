@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.Repository;
+using ReviewAggregatorWebApp.ViewModel;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Globalization;
@@ -119,44 +121,47 @@ namespace ReviewAggregatorWebApp.Controllers
 
         public IActionResult Create()
         {
-            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
-            ViewBag.Genres = _genresRepository.AllGenres.ToList();
-            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
-            return View();
+            var viewModel = new MovieViewModel
+            {
+                Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name"),
+                Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name"),
+                Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name")
+            };
+            return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult Create(Movie movie, int[] selectedCountries, int[] selectedGenres)
+        public IActionResult Create(MovieViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Добавление выбранных стран и жанров
-                if (selectedCountries != null)
+                var movie = new Movie
                 {
-                    movie.Countries = selectedCountries.Select(id => _countriesRepository.GetById(id)).ToList();
-                }
-                if (selectedGenres != null)
-                {
-                    movie.Genres = selectedGenres.Select(id => _genresRepository.GetById(id)).ToList();
-                }
+                    Name = model.Name,
+                    PosterLink = model.PosterLink,
+                    DirectorId = model.DirectorId,
+                    ReleaseDate = model.ReleaseDate,
+                    Rating = model.Rating,
+                    Countries = model.CountryIds.Select(id => _countriesRepository.GetById(id)).ToList(),
+                    Genres = model.GenreIds.Select(id => _genresRepository.GetById(id)).ToList()
+                };
 
                 if (!movie.Countries.Any() || !movie.Genres.Any())
                 {
                     ModelState.AddModelError("", "Фильм должен иметь хотя бы одну страну и один жанр.");
-                    ViewBag.Countries = _countriesRepository.AllCountries.ToList();
-                    ViewBag.Genres = _genresRepository.AllGenres.ToList();
-                    ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
-                    return View(movie);
                 }
-
-                _moviesRepository.Create(movie);
-                return RedirectToAction("Index");
+                else
+                {
+                    _moviesRepository.Create(movie);
+                    return RedirectToAction("Index");
+                }
             }
 
-            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
-            ViewBag.Genres = _genresRepository.AllGenres.ToList();
-            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
-            return View(movie);
+            // Заполнение списков в случае ошибки валидации
+            model.Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name");
+            model.Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name");
+            model.Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name");
+            return View(model);
         }
 
         public IActionResult Edit(int id)
@@ -164,64 +169,58 @@ namespace ReviewAggregatorWebApp.Controllers
             var movie = _moviesRepository.GetById(id);
             if (movie == null) return NotFound();
 
-            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
-            ViewBag.Genres = _genresRepository.AllGenres.ToList();
-            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
-            return View(movie);
+            var model = new MovieViewModel
+            {
+                Id = movie.Id,
+                Name = movie.Name,
+                PosterLink = movie.PosterLink,
+                DirectorId = movie.DirectorId,
+                ReleaseDate = movie.ReleaseDate,
+                Rating = movie.Rating,
+                CountryIds = movie.Countries.Select(c => c.Id).ToList(),
+                GenreIds = movie.Genres.Select(g => g.Id).ToList(),
+                Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name"),
+                Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name"),
+                Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name"),
+                IsEditing = true
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult Edit(Movie movie, int[] selectedCountries, int[] selectedGenres)
+        public IActionResult Edit(MovieViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Получаем существующий фильм из базы данных
-                var existingMovie = _moviesRepository.GetById(movie.Id);
+                var existingMovie = _moviesRepository.GetById(model.Id);
+                if (existingMovie == null) return NotFound();
 
-                // Обновляем свойства
-                existingMovie.Name = movie.Name;
-                existingMovie.PosterLink = movie.PosterLink;
-                existingMovie.DirectorId = movie.DirectorId;
-                existingMovie.ReleaseDate = movie.ReleaseDate;
-                existingMovie.Rating = movie.Rating;
+                existingMovie.Name = model.Name;
+                existingMovie.PosterLink = model.PosterLink;
+                existingMovie.DirectorId = model.DirectorId;
+                existingMovie.ReleaseDate = model.ReleaseDate;
+                existingMovie.Rating = model.Rating;
 
-                // Обновление выбранных стран
-                if (selectedCountries != null)
-                {
-                    existingMovie.Countries = selectedCountries.Select(id => _countriesRepository.GetById(id)).ToList();
-                }
-                else
-                {
-                    existingMovie.Countries.Clear(); // Если страны не выбраны, очищаем
-                }
-
-                // Обновление выбранных жанров
-                if (selectedGenres != null)
-                {
-                    existingMovie.Genres = selectedGenres.Select(id => _genresRepository.GetById(id)).ToList();
-                }
-                else
-                {
-                    existingMovie.Genres.Clear(); // Если жанры не выбраны, очищаем
-                }
+                existingMovie.Countries = model.CountryIds.Select(id => _countriesRepository.GetById(id)).ToList();
+                existingMovie.Genres = model.GenreIds.Select(id => _genresRepository.GetById(id)).ToList();
 
                 if (!existingMovie.Countries.Any() || !existingMovie.Genres.Any())
                 {
                     ModelState.AddModelError("", "Фильм должен иметь хотя бы одну страну и один жанр.");
-                    ViewBag.Countries = _countriesRepository.AllCountries.ToList();
-                    ViewBag.Genres = _genresRepository.AllGenres.ToList();
-                    ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
-                    return View(movie);
                 }
-
-                _moviesRepository.Update(existingMovie);
-                return RedirectToAction("Index");
+                else
+                {
+                    _moviesRepository.Update(existingMovie);
+                    return RedirectToAction("Index");
+                }
             }
 
-            ViewBag.Countries = _countriesRepository.AllCountries.ToList();
-            ViewBag.Genres = _genresRepository.AllGenres.ToList();
-            ViewBag.Directors = _directorsRepository.AllDirectors.ToList();
-            return View(movie);
+            // Заполнение списков в случае ошибки валидации
+            model.Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name");
+            model.Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name");
+            model.Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name");
+            return View(model);
         }
 
         public IActionResult Delete(int id)

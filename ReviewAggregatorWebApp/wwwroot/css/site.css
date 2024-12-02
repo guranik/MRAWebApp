@@ -31,7 +31,7 @@ body {
 }
 
 .list-button {
-    width: 900px; /* Ширина кнопки */
+    width: 950px; /* Ширина кнопки */
     height: 90px; /* Высота кнопки */
     background-color: rgba(0, 0, 0, 0); /* Цвет кнопки */
     color: rgb(0, 0, 0); /* Цвет текста */

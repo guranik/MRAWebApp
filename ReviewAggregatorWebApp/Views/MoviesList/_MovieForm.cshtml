@@ -1,0 +1,92 @@
+﻿@model ReviewAggregatorWebApp.ViewModel.MovieViewModel
+
+<div>
+    <h1>@(Model.IsEditing ? "Редактировать фильм" : "Создать фильм")</h1>
+    <form asp-action="@(Model.IsEditing ? "Edit" : "Create")">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="PosterLink"></label>
+            <input asp-for="PosterLink" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="DirectorId"></label>
+            <select asp-for="DirectorId" class="form-control" asp-items="Model.Directors"></select>
+            <span asp-validation-for="DirectorId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ReleaseDate"></label>
+            <input asp-for="ReleaseDate" class="form-control" type="date" />
+            <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Rating"></label>
+            <input asp-for="Rating" class="form-control" />
+            <span asp-validation-for="Rating" class="text-danger"></span>
+        </div>
+
+        <!-- Множественный выбор стран -->
+        <div class="multiselect">
+            <div class="selectBox" onclick="showCheckboxes('countryCheckboxes')">
+                <select class="form-select">
+                    <option>Страны фильма</option>
+                </select>
+                <div class="overSelect"></div>
+            </div>
+            <div class="dropdown-menu checkboxes countryCheckboxes">
+                @foreach (var country in Model.Countries)
+                {
+                    <div class="form-check">
+                        <label for="country_@country.Value" class="form-check-label">
+                            <input type="checkbox" name="CountryIds" value="@country.Value"
+                            @(Model.CountryIds.Contains(int.Parse(country.Value)) ? "checked" : "")
+                                   class="form-check-input" id="country_@country.Value" />@country.Text
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Множественный выбор жанров -->
+        <div class="multiselect">
+            <div class="selectBox" onclick="showCheckboxes('genreCheckboxes')">
+                <select class="form-select">
+                    <option>Жанры фильма</option>
+                </select>
+                <div class="overSelect"></div>
+            </div>
+            <div class="dropdown-menu checkboxes genreCheckboxes">
+                @foreach (var genre in Model.Genres)
+                {
+                    <div class="form-check">
+                        <label for="genre_@genre.Value" class="form-check-label">
+                            <input type="checkbox" name="GenreIds" value="@genre.Value"
+                            @(Model.GenreIds.Contains(int.Parse(genre.Value)) ? "checked" : "")
+                                   class="form-check-input" id="genre_@genre.Value" />@genre.Text
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+
+<script>
+    var expanded = false;
+
+    function showCheckboxes(checkboxesClass) {
+        var checkboxes = document.querySelector('.' + checkboxesClass);
+        if (checkboxes.style.display === "block") {
+            checkboxes.style.display = "none";
+        } else {
+            checkboxes.style.display = "block";
+        }
+    }
+</script>
