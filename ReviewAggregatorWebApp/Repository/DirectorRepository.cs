@@ -33,9 +33,8 @@ namespace ReviewAggregatorWebApp.Repository
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(Director director)
         {
-            var director = GetById(id);
             _context.Directors.Remove(director);
             _context.SaveChanges();
         }

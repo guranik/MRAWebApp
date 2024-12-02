@@ -13,6 +13,6 @@ namespace ReviewAggregatorWebApp.Interfaces
         User GetUser(int id);
         void Create(User user);
         void Update(User user);
-        void Delete(int id);
+        void Delete(User user);
     }
 }

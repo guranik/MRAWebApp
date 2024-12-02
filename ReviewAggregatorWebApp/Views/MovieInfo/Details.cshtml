@@ -39,3 +39,119 @@
 </p>
 <p>Рейтинг: @Model.Rating</p>
 <p>Постер: <img src="@Model.PosterLink" alt="@Model.Name" /></p>
+
+<div id="review-input">
+    <h2>Оставьте свой отзыв</h2>
+
+    <div id="star-rating" style="text-align: right;">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+    </div>
+
+    <textarea id="review-text" placeholder="Введите ваш отзыв здесь..." rows="4" cols="50"></textarea>
+
+    <button id="submit-review" onclick="submitReview(@Model.Id)">Отправить отзыв</button>
+</div>
+
+<div id="reviews-container">
+    <!-- Здесь будут загружаться отзывы -->
+</div>
+
+<div id="pagination">
+    <button id="prev-page" onclick="loadReviews(@Model.Id, 1)">Назад</button>
+    <button id="next-page" onclick="loadReviews(@Model.Id, 2)">Вперед</button>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedRating = 0;
+
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function () {
+                selectedRating = this.getAttribute('data-value');
+                document.querySelectorAll('.star').forEach(s => {
+                    s.classList.remove('selected');
+                });
+                for (let i = 0; i < selectedRating; i++) {
+                    document.querySelectorAll('.star')[i].classList.add('selected');
+                }
+            });
+        });
+
+        function submitReview(movieId) {
+            const reviewText = document.getElementById('review-text').value;
+
+            if (selectedRating === 0 || reviewText.trim() === "") {
+                alert("Пожалуйста, выберите рейтинг и введите текст отзыва.");
+                return;
+            }
+
+            const reviewData = {
+                MovieId: movieId,
+                Rating: selectedRating,
+                ReviewText: reviewText
+            };
+
+            fetch('/Reviews/Create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reviewData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Отзыв успешно добавлен!");
+                        loadReviews(movieId, 1); // Reload reviews
+                        document.getElementById('review-text').value = ""; // Clear the text area
+                        selectedRating = 0; // Reset rating
+                        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected')); // Reset stars
+                    } else {
+                        alert("Ошибка при добавлении отзыва.");
+                    }
+                });
+        }
+
+        let currentPage = 1;
+
+        function loadReviews(movieId, page) {
+            currentPage = page;
+            fetch(`/Reviews/GetReviews?movieId=${movieId}&page=${currentPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    const reviewsContainer = document.getElementById('reviews-container');
+                    reviewsContainer.innerHTML = '';
+
+                    data.reviews.forEach(review => {
+                        const reviewElement = document.createElement('div');
+                        reviewElement.innerHTML = `
+                            <h3>${review.User.Name}</h3>
+                            <p>${review.ReviewText}</p>
+                            <p>Рейтинг: ${review.Rating}</p>
+                            <p>Дата: ${new Date(review.PostDate).toLocaleDateString()}</p>
+                        `;
+                        reviewsContainer.appendChild(reviewElement);
+                    });
+
+                    updatePagination(data.totalPages);
+                });
+        }
+
+        function updatePagination(totalPages) {
+            const prevButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+        }
+
+        // Загрузите отзывы при первой загрузке страницы
+        document.addEventListener('DOMContentLoaded', function () {
+            loadReviews(@Model.Id, currentPage);
+        });
+    </script>
+}

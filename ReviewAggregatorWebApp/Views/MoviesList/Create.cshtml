@@ -1,0 +1,52 @@
+﻿@model ReviewAggregatorWebApp.Model.Movie
+
+<h1>Добавить фильм</h1>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PosterLink"></label>
+        <input asp-for="PosterLink" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="DirectorId"></label>
+        <select asp-for="DirectorId" class="form-control" asp-items="@(new SelectList(ViewBag.Directors, "Id", "Name"))"></select>
+        <span asp-validation-for="DirectorId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ReleaseDate"></label>
+        <input asp-for="ReleaseDate" class="form-control" type="date" />
+        <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Rating"></label>
+        <input asp-for="Rating" class="form-control" />
+        <span asp-validation-for="Rating" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Страны</label>
+        <select multiple class="form-control" name="selectedCountries">
+            @foreach (var country in ViewBag.Countries)
+            {
+                <option value="@country.Id">@country.Name</option>
+            }
+        </select>
+        <span asp-validation-for="Countries" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Жанры</label>
+        <select multiple class="form-control" name="selectedGenres">
+            @foreach (var genre in ViewBag.Genres)
+            {
+                <option value="@genre.Id">@genre.Name</option>
+            }
+        </select>
+        <span asp-validation-for="Genres" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+</form>

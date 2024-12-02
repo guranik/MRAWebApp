@@ -13,7 +13,7 @@ namespace ReviewAggregatorWebApp.Interfaces
         Movie GetById(int id);
         void Create(Movie movie);
         void Update(Movie movie);
-        void Delete(int id);
+        void Delete(Movie movie);
         IEnumerable<Movie> GetFilteredMovies(string filterType, string filterValue);
 
     }

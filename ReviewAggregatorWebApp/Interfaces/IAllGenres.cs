@@ -13,6 +13,6 @@ namespace ReviewAggregatorWebApp.Interfaces
         Genre GetById(int id);
         void Create(Genre genre);
         void Update(Genre genre);
-        void Delete(int id);
+        void Delete(Genre genre);
     }
 }

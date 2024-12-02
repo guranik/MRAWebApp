@@ -13,6 +13,6 @@ namespace ReviewAggregatorWebApp.Interfaces
         Country GetById(int id);
         void Create(Country country);
         void Update(Country country);
-        void Delete(int id);
+        void Delete(Country country);
     }
 }

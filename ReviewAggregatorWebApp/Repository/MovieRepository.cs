@@ -74,9 +74,8 @@ namespace ReviewAggregatorWebApp.Repository
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public void Delete(Movie movie)
         {
-            var movie = GetById(id);
             _context.Movies.Remove(movie);
             _context.SaveChanges();
         }

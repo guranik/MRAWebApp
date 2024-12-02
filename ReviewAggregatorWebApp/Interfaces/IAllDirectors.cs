@@ -13,6 +13,6 @@ namespace ReviewAggregatorWebApp.Interfaces
         Director GetById(int id);
         void Create(Director director);
         void Update(Director director);
-        void Delete(int id);
+        void Delete(Director director);
     }
 }

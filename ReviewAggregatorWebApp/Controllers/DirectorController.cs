@@ -29,5 +29,39 @@ namespace ReviewAggregatorWebApp.Controllers
 
             return View(directors);
         }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(Director director)
+        {
+            if (ModelState.IsValid)
+            {
+                _directorsRepository.Create(director);
+                return RedirectToAction("Index");
+            }
+            return View(director);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var director = _directorsRepository.GetById(id);
+            if (director == null) return NotFound();
+            return View(director);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Director director)
+        {
+            if (ModelState.IsValid)
+            {
+                _directorsRepository.Update(director);
+                return RedirectToAction("Index");
+            }
+            return View(director);
+        }
     }
 }
