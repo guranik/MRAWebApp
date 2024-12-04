@@ -10,6 +10,8 @@ namespace ReviewAggregatorWebApp.Interfaces
     public interface IAllCountries
     {
         IEnumerable<Country> AllCountries { get; }
+        int GetTotalCount();
+        PagedList<Country> GetPagedCountries(int pageNumber, int pageSize);
         Country GetById(int id);
         void Create(Country country);
         void Update(Country country);

@@ -1,0 +1,577 @@
+Я хочу реализовать функцию разбиения на страницы для стран, режиссеров и фильмов. Вот классы репозиториев для этих классов:
+
+using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ReviewAggregatorWebApp.Repository
+{
+    public class CountryRepository : IAllCountries
+    {
+        private readonly Db8428Context _context;
+        public CountryRepository(Db8428Context context)
+        {
+            _context = context;
+        }
+
+        public IEnumerable<Country> AllCountries => _context.Countries;
+        public int GetTotalCount() => _context.Countries.Count();
+
+        public IEnumerable<Country> GetPagedCountries(int pageNumber, int pageSize)
+        {
+            return _context.Countries
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public Country GetById(int id) => _context.Countries.Find(id)
+            ?? throw new InvalidOperationException($"Country with ID {id} not found.");
+
+        public void Create(Country country)
+        {
+            _context.Countries.Add(country);
+            _context.SaveChanges();
+        }
+
+        public void Update(Country country)
+        {
+            _context.Countries.Update(country);
+            _context.SaveChanges();
+        }
+
+        public void Delete(Country country)
+        {
+            _context.Countries.Remove(country);
+            _context.SaveChanges();
+        }
+    }
+}
+
+using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ReviewAggregatorWebApp.Repository
+{
+    public class DirectorRepository : IAllDirectors
+    {
+        private readonly Db8428Context _context;
+        public DirectorRepository(Db8428Context context)
+        {
+            _context = context;
+        }
+
+        public IEnumerable<Director> AllDirectors => _context.Directors;
+
+        public int GetTotalCount() => _context.Directors.Count();
+        public IEnumerable<Director> GetPagedDirectors(int pageNumber, int pageSize)
+        {
+            return _context.Directors
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public Director GetById(int id) => _context.Directors.Find(id)
+            ?? throw new InvalidOperationException($"Director with ID {id} not found.");
+
+        public void Create(Director director)
+        {
+            _context.Directors.Add(director);
+            _context.SaveChanges();
+        }
+
+        public void Update(Director director)
+        {
+            _context.Directors.Update(director);
+            _context.SaveChanges();
+        }
+
+        public void Delete(Director director)
+        {
+            _context.Directors.Remove(director);
+            _context.SaveChanges();
+        }
+    }
+}
+
+using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Model;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ReviewAggregatorWebApp.Repository
+{
+    public class MovieRepository : IAllMovies
+    {
+        private readonly Db8428Context _context;
+
+        public MovieRepository(Db8428Context context)
+        {
+            _context = context;
+        }
+
+        public IEnumerable<Movie> AllMovies => _context.Movies
+            .Include(x => x.Director)
+            .Include(x => x.Genres)
+            .Include(x => x.Countries);
+
+        public int GetTotalCount() => _context.Movies.Count();
+
+        public IEnumerable<Movie> GetFilteredMovies(string filterType, string filterValue)
+        {
+            IEnumerable<Movie> movies = AllMovies;
+
+            switch (filterType.ToLower())
+            {
+                case "genre":
+                    movies = movies.Where(m => m.Genres.Any(g => g.Name == filterValue));
+                    break;
+
+                case "director":
+                    movies = movies.Where(m => m.Director != null && m.Director.Name == filterValue);
+                    break;
+
+                case "country":
+                    movies = movies.Where(m => m.Countries.Any(c => c.Name == filterValue));
+                    break;
+
+                case "year":
+                    if (int.TryParse(filterValue, out int year))
+                    {
+                        movies = movies.Where(m => m.ReleaseDate.Year == year);
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentException("Invalid filter type");
+            }
+
+            return movies;
+        }
+
+        public IEnumerable<Movie> GetPagedMovies(int pageNumber, int pageSize)
+        {
+            return _context.Movies
+                .Include(x => x.Director)
+                .Include(x => x.Genres)
+                .Include(x => x.Countries)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+        public Movie GetById(int id) => _context.Movies
+            .Include(x => x.Director)
+            .Include(x => x.Genres)
+            .Include(x => x.Countries)
+            .FirstOrDefault(x => x.Id == id) ??
+                throw new InvalidOperationException($"Movie with ID {id} not found.");
+
+        public void Create(Movie movie)
+        {
+            _context.Movies.Add(movie);
+            _context.SaveChanges();
+        }
+
+        public void Update(Movie movie)
+        {
+            _context.Movies.Update(movie);
+            _context.SaveChanges();
+        }
+
+        public void Delete(Movie movie)
+        {
+            _context.Movies.Remove(movie);
+            _context.SaveChanges();
+        }
+    }
+}
+
+Вот страницы списков фильмов, стран и режиссеров:
+
+namespace ReviewAggregatorWebApp.Controllers
+{
+    public class MoviesListController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllMovies _moviesRepository;
+        private readonly IAllCountries _countriesRepository;
+        private readonly IAllGenres _genresRepository;
+        private readonly IAllDirectors _directorsRepository;
+
+        public MoviesListController(
+            IMemoryCache cache, IAllMovies moviesRepository, 
+            IAllCountries countriesRepository, IAllGenres genresRepository, 
+            IAllDirectors directorsRepository)
+        {
+            _cache = cache;
+            _moviesRepository = moviesRepository;
+            _countriesRepository = countriesRepository;
+            _genresRepository = genresRepository;
+            _directorsRepository = directorsRepository;
+        }
+
+        public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating", int pageNumber = 1)
+        {
+            if (!_cache.TryGetValue("movies", out List<Movie>
+            movies))
+            {
+                return NotFound("Movies not found in cache.");
+            }
+            if (!_cache.TryGetValue("genres", out List<Genre>
+            genres))
+            {
+                return NotFound("Genres not found in cache.");
+            }
+            if (!_cache.TryGetValue("countries", out List<Country>
+            countries))
+            {
+                return NotFound("Countries not found in cache.");
+            }
+            if (!_cache.TryGetValue("directors", out List<Director>
+            directors))
+            {
+                return NotFound("Directors not found in cache.");
+            }
+            if (!_cache.TryGetValue("years", out List<int>
+            years))
+            {
+                return NotFound("Years not found in cache.");
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                HttpContext.Session.SetString("SortOrder", sortBy);
+            }
+            else
+            {
+                sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
+            }
+
+            ViewBag.SortOrder = sortBy;
+
+            IEnumerable<Movie>
+                filteredMovies = movies;
+
+            if (!string.IsNullOrEmpty(genre))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Genres.Any(g => g.Name == genre));
+            }
+
+            if (!string.IsNullOrEmpty(director))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Director != null && m.Director.Name == director);
+            }
+
+            if (!string.IsNullOrEmpty(country))
+            {
+                filteredMovies = filteredMovies.Where(m => m.Countries.Any(c => c.Name == country));
+            }
+
+            if (!string.IsNullOrEmpty(year))
+            {
+                filteredMovies = filteredMovies.Where(m => m.ReleaseDate.Year.ToString() == year);
+            }
+
+            switch (sortBy?.ToLower())
+            {
+                case "rating":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.Rating);
+                    break;
+                case "date":
+                    filteredMovies = filteredMovies.OrderByDescending(m => m.ReleaseDate);
+                    break;
+            }
+
+            // Передаем данные для фильтров в представление
+            ViewBag.Genres = genres;
+            ViewBag.Years = years;
+            ViewBag.Directors = directors;
+            ViewBag.Countries = countries;
+
+            ViewBag.Year = year;
+            ViewBag.Country = country;
+            ViewBag.Director = director;
+            ViewBag.Genre = genre;
+
+            return View(filteredMovies);
+        }
+    }
+}
+
+namespace ReviewAggregatorWebApp.Controllers
+{
+    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
+    public class DirectorsController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllDirectors _directorsRepository;
+
+        public DirectorsController(IMemoryCache cache, IAllDirectors directorsRepository)
+        {
+            _cache = cache;
+            _directorsRepository = directorsRepository;
+        }
+
+        public IActionResult Index()
+        {
+            if (!_cache.TryGetValue("directors", out List<Director> directors))
+            {
+                directors = _directorsRepository.AllDirectors.ToList();
+                _cache.Set("directors", directors, TimeSpan.FromSeconds(256));
+            }
+
+            return View(directors);
+        }
+    }
+}
+
+namespace ReviewAggregatorWebApp.Controllers
+{
+    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
+    public class CountriesController : Controller
+    {
+        private readonly IMemoryCache _cache;
+        private readonly IAllCountries _countriesRepository;
+
+        public CountriesController(IMemoryCache cache, IAllCountries countriesRepository)
+        {
+            _cache = cache;
+            _countriesRepository = countriesRepository;
+        }
+
+        public IActionResult Index()
+        {
+            if (!_cache.TryGetValue("countries", out List<Country> countries))
+            {
+                countries = _countriesRepository.AllCountries.ToList();
+                _cache.Set("countries", countries, TimeSpan.FromSeconds(256));
+            }
+
+            return View(countries);
+        }
+    }
+}
+
+@model IEnumerable<ReviewAggregatorWebApp.Model.Country>
+
+@{
+    Layout = "~/Views/Shared/MovieFiltersLayout.cshtml";
+}
+<h1>Список стран</h1>
+
+<div style="margin-bottom: 10px; margin-left: 30px;">
+    <a asp-action="Create" class="btn btn-primary">Добавить страну</a>
+</div>
+
+<div class="d-flex flex-column align-items-center">
+    @foreach (var country in Model)
+    {
+        <div class="country-item list-button d-flex align-items-center" style="width: 100%; cursor: pointer">
+            <span style="flex: 0 0 70%; cursor: pointer; display: flex; align-items: center; height: 100%;" onclick="location.href='@Url.Action("Filter", "MoviesList", new { country = country })';">@country.Name</span>
+            <div style="flex: 0 0 30%; display: flex; justify-content: flex-end; position: relative;">
+                <form asp-action="Edit" asp-route-id="@country.Id" method="get" style="margin-right: 5px; z-index: 1;">
+                    <button type="submit" class="btn btn-secondary" style="width: 100%;">Изменить</button>
+                </form>
+                <form asp-action="Delete" asp-route-id="@country.Id" method="post" style="margin-right: 20px;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить эту страну?');" style="width: 100%;">Удалить</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+
+@model IEnumerable<ReviewAggregatorWebApp.Model.Director>
+
+@{
+    Layout = "~/Views/Shared/MovieFiltersLayout.cshtml";
+}
+<h1>Список режиссеров</h1>
+
+<div style="margin-bottom: 10px; margin-left: 30px;">
+    <a asp-action="Create" class="btn btn-primary">Добавить режиссера</a>
+</div>
+
+<div class="d-flex flex-column align-items-center">
+    @foreach (var director in Model)
+    {
+        <div class="country-item list-button d-flex align-items-center" style="width: 100%; cursor: pointer">
+            <span style="flex: 0 0 70%; cursor: pointer; display: flex; align-items: center; height: 100%;" onclick="location.href='@Url.Action("Filter", "MoviesList", new { director = director })';">@director.Name</span>
+            <div style="flex: 0 0 30%; display: flex; justify-content: flex-end; position: relative;">
+                <form asp-action="Edit" asp-route-id="@director.Id" method="get" style="margin-right: 5px; z-index: 1;">
+                    <button type="submit" class="btn btn-secondary" style="width: 100%;">Изменить</button>
+                </form>
+                <form asp-action="Delete" asp-route-id="@director.Id" method="post" style="margin-right: 20px;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить этого режиссера?');" style="width: 100%;">Удалить</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+
+@model IEnumerable<ReviewAggregatorWebApp.Model.Movie>
+@{
+    var genre = ViewBag.Genre;
+    var year = ViewBag.Year;
+    var director = ViewBag.Director;
+    var country = ViewBag.Country;
+    var sortOrder = ViewBag.SortOrder;
+
+    // Получаем данные для фильтров из кэша
+    var genres = ViewBag.Genres;
+    var years = ViewBag.Years;
+    var directors = ViewBag.Directors;
+    var countries = ViewBag.Countries;
+
+    // Формируем заголовок страницы
+    string genreTitle = string.IsNullOrEmpty(genre) ? "" : $" жанра {genre}";
+    string yearTitle = string.IsNullOrEmpty(year) ? "" : $" {year} года";
+    string directorTitle = string.IsNullOrEmpty(director) ? "" : $" режиссера {director}";
+    string countryTitle = string.IsNullOrEmpty(country) ? "" : $", созданные в стране {country}";
+
+    Layout = "~/Views/Shared/MainLayout.cshtml";
+}
+
+<h1>Фильмы@(genreTitle + yearTitle + directorTitle + countryTitle)</h1>
+
+<div class="filter-section">
+    <form method="get" action="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder })">
+        <div class="form-group">
+            <label for="genre">Жанр:</label>
+            <select id="genre" name="genre" class="form-control">
+                <option value="">Все</option>
+                @foreach (var g in genres)
+                {
+                    <option value="@g" selected="@(g.ToString() == genre ? "selected" : null)">@g</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="year">Год выхода:</label>
+            <select id="year" name="year" class="form-control">
+                <option value="">Все</option>
+                @foreach (var y in years)
+                {
+                    <option value="@y" selected="@(y.ToString() == year ? "selected" : null)">@y</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="director">Режиссер:</label>
+            <select id="director" name="director" class="form-control">
+                <option value="">Все</option>
+                @foreach (var d in directors)
+                {
+                    <option value="@d" selected="@(d.ToString() == director ? "selected" : null)">@d</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="country">Страна:</label>
+            <select id="country" name="country" class="form-control">
+                <option value="">Все</option>
+                @foreach (var c in countries)
+                {
+                    <option value="@c" selected="@(c.ToString() == country ? "selected" : null)">@c</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+    </form>
+</div>
+
+<div class="form-group">
+    <label for="sortOptions">Сортировать по:</label>
+    <select id="sortOptions" class="form-control" onchange="location = this.value;">
+        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "rating" })" selected="@(sortOrder == "rating" ? "selected" : null)">По рейтингу</option>
+        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "date" })" selected="@(sortOrder == "date" ? "selected" : null)">По дате</option>
+    </select>
+</div>
+
+<div>
+    <a asp-action="Create" class="btn btn-primary">Добавить фильм</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <ul>
+        @foreach (var movie in Model)
+        {
+            <li class="movie-item">
+                <div class="movie-info">
+                    <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })" class="movie-link">
+                        <strong>
+                            @movie.Name
+                        </strong> - @(movie.ReleaseDate.Year.ToString())
+                        <br />
+                        Жанры: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
+                        <br />
+                        Режиссер: @(movie.Director?.Name ?? "–")
+                        <br />
+                        Страны: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
+                    </a>
+
+                    <div>
+                        <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary">Изменить</a>
+                        <button class="btn btn-danger" onclick="confirmDelete(@movie.Id)">Удалить</button>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Фильмы не найдены.</p>
+}
+
+<script>
+    function confirmDelete(movieId) {
+        if (confirm("Вы уверены, что хотите удалить этот фильм?")) {
+            window.location.href = '@Url.Action("Delete")/' + movieId;
+        }
+    }
+</script>
+
+
+Как реализовать эту функцию с переиспользованием кода?
+
+Так же в моем проекте уже присутствует класс, который представляет собой страницу объектов:
+namespace ReviewAggregatorWebApp.Model
+{
+    public class PagedList<T>
+    {
+        public List<T> Items { get; set; }
+        public int TotalCount { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
+
+        public PagedList(List<T> items, int totalCount, int pageNumber, int pageSize)
+        {
+            Items = items;
+            TotalCount = totalCount;
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+        }
+
+        public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    }
+}

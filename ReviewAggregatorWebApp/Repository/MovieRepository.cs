@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace ReviewAggregatorWebApp.Repository
 {
@@ -23,36 +24,48 @@ namespace ReviewAggregatorWebApp.Repository
             .Include(x => x.Genres)
             .Include(x => x.Countries);
 
-        public IEnumerable<Movie> GetFilteredMovies(string filterType, string filterValue)
+        public int GetTotalCount() => _context.Movies.Count();
+
+        public PagedList<Movie> GetPagedMovies(string genre, string year, string director, string country, string sortBy, int pageNumber, int pageSize)
         {
-            IEnumerable<Movie> movies = AllMovies;
+            IQueryable<Movie> movies = _context.Movies
+                .Include(x => x.Director)
+                .Include(x => x.Genres)
+                .Include(x => x.Countries);
 
-            switch (filterType.ToLower())
+            if (!string.IsNullOrWhiteSpace(genre))
             {
-                case "genre":
-                    movies = movies.Where(m => m.Genres.Any(g => g.Name == filterValue));
-                    break;
-
-                case "director":
-                    movies = movies.Where(m => m.Director != null && m.Director.Name == filterValue);
-                    break;
-
-                case "country":
-                    movies = movies.Where(m => m.Countries.Any(c => c.Name == filterValue));
-                    break;
-
-                case "year":
-                    if (int.TryParse(filterValue, out int year))
-                    {
-                        movies = movies.Where(m => m.ReleaseDate.Year == year);
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentException("Invalid filter type");
+                movies = movies.Where(m => m.Genres.Any(g => g.Name.ToLower() == genre.ToLower()));
             }
 
-            return movies;
+            if (!string.IsNullOrWhiteSpace(director))
+            {
+                movies = movies.Where(m => m.Director != null && m.Director.Name.ToLower() == director.ToLower());
+            }
+
+            if (!string.IsNullOrWhiteSpace(country))
+            {
+                movies = movies.Where(m => m.Countries.Any(c => c.Name.ToLower() == country.ToLower()));
+            }
+
+            if (int.TryParse(year, out int parsedYear))
+            {
+                movies = movies.Where(m => m.ReleaseDate.Year == parsedYear);
+            }
+
+            var totalCount = movies.Count();
+            switch (sortBy?.ToLower())
+            {
+                case "rating":
+                    movies = movies.OrderByDescending(m => m.Rating);
+                    break;
+                case "date":
+                    movies = movies.OrderByDescending(m => m.ReleaseDate);
+                    break;
+            }
+            var pagedMovies = movies.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PagedList<Movie>(pagedMovies, totalCount, pageNumber, pageSize);
         }
 
         public Movie GetById(int id) => _context.Movies

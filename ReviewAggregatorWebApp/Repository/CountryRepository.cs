@@ -17,6 +17,18 @@ namespace ReviewAggregatorWebApp.Repository
         }
 
         public IEnumerable<Country> AllCountries => _context.Countries;
+        public int GetTotalCount() => _context.Countries.Count();
+
+        public PagedList<Country> GetPagedCountries(int pageNumber, int pageSize)
+        {
+            var countries = _context.Countries
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var totalCount = _context.Countries.Count();
+            return new PagedList<Country>(countries, totalCount, pageNumber, pageSize);
+        }
 
         public Country GetById(int id) => _context.Countries.Find(id)
             ?? throw new InvalidOperationException($"Country with ID {id} not found.");

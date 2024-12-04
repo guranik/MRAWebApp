@@ -20,15 +20,21 @@ namespace ReviewAggregatorWebApp.Controllers
             _directorsRepository = directorsRepository;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int pageNumber = 1)
         {
+            int pageSize = 20;
+            var pagedDirectors = _directorsRepository.GetPagedDirectors(pageNumber, pageSize);
+
             if (!_cache.TryGetValue("directors", out List<Director> directors))
             {
-                directors = _directorsRepository.AllDirectors.ToList();
+                directors = pagedDirectors.Items;
                 _cache.Set("directors", directors, TimeSpan.FromSeconds(256));
             }
 
-            return View(directors);
+            ViewBag.CurrentPage = pagedDirectors.PageNumber;
+            ViewBag.TotalPages = pagedDirectors.TotalPages;
+
+            return View(pagedDirectors.Items);
         }
 
         public IActionResult Create()

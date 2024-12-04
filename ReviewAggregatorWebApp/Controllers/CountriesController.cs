@@ -20,15 +20,21 @@ namespace ReviewAggregatorWebApp.Controllers
             _countriesRepository = countriesRepository;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int pageNumber = 1)
         {
+            int pageSize = 20;
+            var pagedCountries = _countriesRepository.GetPagedCountries(pageNumber, pageSize);
+
             if (!_cache.TryGetValue("countries", out List<Country> countries))
             {
-                countries = _countriesRepository.AllCountries.ToList();
+                countries = pagedCountries.Items;
                 _cache.Set("countries", countries, TimeSpan.FromSeconds(256));
             }
 
-            return View(countries);
+            ViewBag.CurrentPage = pagedCountries.PageNumber;
+            ViewBag.TotalPages = pagedCountries.TotalPages;
+
+            return View(pagedCountries.Items);
         }
 
         public IActionResult Create()

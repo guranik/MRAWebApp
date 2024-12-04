@@ -18,6 +18,18 @@ namespace ReviewAggregatorWebApp.Repository
 
         public IEnumerable<Director> AllDirectors => _context.Directors;
 
+        public int GetTotalCount() => _context.Directors.Count();
+        public PagedList<Director> GetPagedDirectors(int pageNumber, int pageSize)
+        {
+            var directors = _context.Directors
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var totalCount = _context.Directors.Count();
+            return new PagedList<Director>(directors, totalCount, pageNumber, pageSize);
+        }
+
         public Director GetById(int id) => _context.Directors.Find(id)
             ?? throw new InvalidOperationException($"Director with ID {id} not found.");
 

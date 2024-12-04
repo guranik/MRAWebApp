@@ -33,13 +33,8 @@ namespace ReviewAggregatorWebApp.Controllers
             _directorsRepository = directorsRepository;
         }
 
-        public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating")
+        public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating", int pageNumber = 1)
         {
-            if (!_cache.TryGetValue("movies", out List<Movie>
-            movies))
-            {
-                return NotFound("Movies not found in cache.");
-            }
             if (!_cache.TryGetValue("genres", out List<Genre>
             genres))
             {
@@ -70,40 +65,8 @@ namespace ReviewAggregatorWebApp.Controllers
                 sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
             }
 
-            ViewBag.SortOrder = sortBy;
+            var filteredMovies = _moviesRepository.GetPagedMovies(genre, year, director, country, sortBy, pageNumber, 15);  
 
-            IEnumerable<Movie>
-                filteredMovies = movies;
-
-            if (!string.IsNullOrEmpty(genre))
-            {
-                filteredMovies = filteredMovies.Where(m => m.Genres.Any(g => g.Name == genre));
-            }
-
-            if (!string.IsNullOrEmpty(director))
-            {
-                filteredMovies = filteredMovies.Where(m => m.Director != null && m.Director.Name == director);
-            }
-
-            if (!string.IsNullOrEmpty(country))
-            {
-                filteredMovies = filteredMovies.Where(m => m.Countries.Any(c => c.Name == country));
-            }
-
-            if (!string.IsNullOrEmpty(year))
-            {
-                filteredMovies = filteredMovies.Where(m => m.ReleaseDate.Year.ToString() == year);
-            }
-
-            switch (sortBy?.ToLower())
-            {
-                case "rating":
-                    filteredMovies = filteredMovies.OrderByDescending(m => m.Rating);
-                    break;
-                case "date":
-                    filteredMovies = filteredMovies.OrderByDescending(m => m.ReleaseDate);
-                    break;
-            }
 
             // Передаем данные для фильтров в представление
             ViewBag.Genres = genres;
@@ -115,8 +78,11 @@ namespace ReviewAggregatorWebApp.Controllers
             ViewBag.Country = country;
             ViewBag.Director = director;
             ViewBag.Genre = genre;
+            ViewBag.SortOrder = sortBy;
+            ViewBag.CurrentPage = filteredMovies.PageNumber;
+            ViewBag.TotalPages = filteredMovies.TotalPages;
 
-            return View(filteredMovies);
+            return View(filteredMovies.Items);
         }
 
         public IActionResult Create()

@@ -10,11 +10,11 @@ namespace ReviewAggregatorWebApp.Interfaces
     public interface IAllMovies
     {
         IEnumerable<Movie> AllMovies { get; }
+        int GetTotalCount();
+        PagedList<Movie> GetPagedMovies(string genre, string year, string director, string country, string sortBy, int pageNumber, int pageSize);
         Movie GetById(int id);
         void Create(Movie movie);
         void Update(Movie movie);
         void Delete(Movie movie);
-        IEnumerable<Movie> GetFilteredMovies(string filterType, string filterValue);
-
     }
 }
