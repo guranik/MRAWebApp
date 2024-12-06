@@ -28,7 +28,6 @@ namespace ReviewAggregatorWebApp.Middleware
             // Создаем новый скоуп
             using (var scope = _scopeFactory.CreateScope())
             {
-                var movieRepository = scope.ServiceProvider.GetRequiredService<IAllMovies>();
                 var countryRepository = scope.ServiceProvider.GetRequiredService<IAllCountries>();
                 var directorRepository = scope.ServiceProvider.GetRequiredService<IAllDirectors>();
                 var genreRepository = scope.ServiceProvider.GetRequiredService<IAllGenres>();

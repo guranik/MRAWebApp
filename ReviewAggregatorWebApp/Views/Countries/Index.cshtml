@@ -25,14 +25,10 @@
         </div>
     }
 </div>
-<div>
-    @if (ViewBag.CurrentPage > 1)
-    {
-        <a asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage - 1)" class="btn btn-secondary">Назад</a>
-    }
 
-    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
-    {
-        <a asp-action="Index" asp-route-pageNumber="@(ViewBag.CurrentPage + 1)" class="btn btn-secondary">Вперед</a>
-    }
-</div>
+@{
+    var currentPage = ViewBag.CurrentPage;
+    var totalPages = ViewBag.TotalPages;
+}
+
+@await Html.PartialAsync("~/Views/Shared/_FilterTablesNavigation.cshtml", (object)Tuple.Create(currentPage, totalPages))

@@ -1,0 +1,50 @@
+﻿@model Tuple<int, int> // Tuple содержит текущую страницу и общее количество страниц
+
+<div class="pagination" style="display: flex; justify-content: center; align-items: center;">
+    @if (Model.Item2 > 1)
+    {
+        // Кнопка "Первая"
+        if (Model.Item1 > 1)
+        {
+            <a href="@Url.Action("Index", new { pageNumber = 1 })" class="btn btn-secondary" style="margin: 0 3px;">1</a>
+        }
+
+        // Многоточие перед предыдущими страницами
+        if (Model.Item1 > 3)
+        {
+            <span style="margin: 0 3px;">...</span>
+        }
+
+        // Кнопки для предыдущих страниц
+        if (Model.Item1 > 2)
+        {
+            <a href="@Url.Action("Index", new { pageNumber = Model.Item1 - 1 })" class="btn btn-secondary" style="margin: 0 3px;">@(Model.Item1 - 1)</a>
+        }
+
+        // Текущая страница
+        <form method="get" class="d-inline-block" style="margin: 0 3px;">
+            <div class="input-group">
+                <input type="number" name="pageNumber" min="1" max="@Model.Item2" value="@Model.Item1" />
+                <button type="submit" class="btn btn-primary">Перейти</button>
+            </div>
+        </form>
+
+        // Кнопка для следующей страницы
+        if (Model.Item1 < Model.Item2 - 1)
+        {
+            <a href="@Url.Action("Index", new { pageNumber = Model.Item1 + 1 })" class="btn btn-secondary" style="margin: 0 3px;">@(Model.Item1 + 1)</a>
+        }
+
+        // Многоточие после следующих страниц
+        if (Model.Item1 < Model.Item2 - 2)
+        {
+            <span style="margin: 0 3px;">...</span>
+        }
+
+        // Кнопка "Последняя"
+        if (Model.Item1 < Model.Item2)
+        {
+            <a href="@Url.Action("Index", new { pageNumber = Model.Item2 })" class="btn btn-secondary" style="margin: 0 3px;">@(Model.Item2)</a>
+        }
+    }
+</div>

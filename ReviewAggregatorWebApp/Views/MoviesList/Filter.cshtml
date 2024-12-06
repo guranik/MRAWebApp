@@ -5,6 +5,7 @@
     var director = ViewBag.Director;
     var country = ViewBag.Country;
     var sortOrder = ViewBag.SortOrder;
+    var pageNumber = ViewBag.CurrentPage;
 
     // Получаем данные для фильтров из кэша
     var genres = ViewBag.Genres;
@@ -117,6 +118,75 @@ else
 {
     <p>Фильмы не найдены.</p>
 }
+
+<div class="pagination" style="display: flex; justify-content: center; align-items: center;">
+    @if (ViewBag.TotalPages > 1)
+    {
+        // Кнопка "Первая"
+        if (ViewBag.CurrentPage > 1)
+        {
+            <a href="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder, pageNumber = 1 })" class="btn btn-secondary" style="margin: 0 3px;">1</a>
+        }
+
+        // Многоточие перед предыдущими страницами
+        if (ViewBag.CurrentPage > 3)
+        {
+            <span style="margin: 0 3px;">...</span>
+        }
+
+        // Кнопки для предыдущих страниц
+        if (ViewBag.CurrentPage > 2)
+        {
+            <a href="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder, pageNumber = ViewBag.CurrentPage - 1 })" class="btn btn-secondary" style="margin: 0 3px;">@(ViewBag.CurrentPage - 1)</a>
+        }
+
+        // Текущая страница
+        <form method="get" class="d-inline-block" style="margin: 0 3px;">
+            <input type="hidden" name="genre" value="@genre" />
+            <input type="hidden" name="year" value="@year" />
+            <input type="hidden" name="director" value="@director" />
+            <input type="hidden" name="country" value="@country" />
+            <input type="hidden" name="sortBy" value="@sortOrder" />
+            <div class="input-group">
+                <input type="number" name="pageNumber" min="1" max="@ViewBag.TotalPages" value="@ViewBag.CurrentPage" />
+                <button type="submit" class="btn btn-primary">Перейти</button>
+            </div>
+        </form>
+
+        // Кнопка для следующей страницы
+        if (ViewBag.CurrentPage < ViewBag.TotalPages - 1)
+        {
+            <a href="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder, pageNumber = ViewBag.CurrentPage + 1 })" class="btn btn-secondary" style="margin: 0 3px;">@(ViewBag.CurrentPage + 1)</a>
+        }
+
+        // Многоточие после следующих страниц
+        if (ViewBag.CurrentPage < ViewBag.TotalPages - 2)
+        {
+            <span style="margin: 0 3px;">...</span>
+        }
+
+        // Кнопка "Последняя"
+        if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a href="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder, pageNumber = ViewBag.TotalPages })" class="btn btn-secondary" style="margin: 0 3px;">@ViewBag.TotalPages</a>
+        }
+    }
+</div>
+
+
+
+<script>
+    function goToPage() {
+        var pageNumber = document.getElementById('currentPage').value;
+        var totalPages = @ViewBag.TotalPages;
+
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            window.location.href = '@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder, pageNumber = "__PAGE__" })'.replace('__PAGE__', pageNumber);
+        } else {
+            alert('Введите корректный номер страницы (от 1 до ' + totalPages + ')');
+        }
+    }
+</script>
 
 <script>
     function confirmDelete(movieId) {
