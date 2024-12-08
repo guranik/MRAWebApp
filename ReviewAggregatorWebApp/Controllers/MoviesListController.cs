@@ -119,7 +119,7 @@ namespace ReviewAggregatorWebApp.Controllers
                 else
                 {
                     _moviesRepository.Create(movie);
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Filter");
                 }
             }
 
@@ -178,14 +178,22 @@ namespace ReviewAggregatorWebApp.Controllers
                 else
                 {
                     _moviesRepository.Update(existingMovie);
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Filter");
                 }
+            }
+
+            var errors = ModelState.Values.SelectMany(v => v.Errors);
+            foreach (var error in errors)
+            {
+                // Логирование или вывод ошибок
+                Console.WriteLine(error.ErrorMessage);
             }
 
             // Заполнение списков в случае ошибки валидации
             model.Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name");
             model.Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name");
             model.Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name");
+            model.IsEditing = true;
             return View(model);
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using ReviewAggregatorWebApp.Model;
 using System.ComponentModel.DataAnnotations;
 
 namespace ReviewAggregatorWebApp.ViewModel
@@ -28,9 +29,9 @@ namespace ReviewAggregatorWebApp.ViewModel
         public List<int> GenreIds { get; set; } = new List<int>(); // Список идентификаторов жанров
 
         // Для отображения списков в выпадающих списках
-        public SelectList Directors { get; set; } = null!; // Список режиссеров
-        public SelectList Genres { get; set; } = null!; // Список жанров
-        public SelectList Countries { get; set; } = null!; // Список стран
+        public SelectList Directors { get; set; } = new SelectList(new List<Director>()); // Список режиссеров
+        public SelectList Genres { get; set; } = new SelectList(new List<Genre>()); // Список жанров
+        public SelectList Countries { get; set; } = new SelectList(new List<Country>()); // Список стран
 
         // Дополнительное свойство для проверки режима редактирования
         public bool IsEditing { get; set; } // Указывает, редактируется ли фильм

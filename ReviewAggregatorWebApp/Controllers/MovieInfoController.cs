@@ -16,6 +16,7 @@ namespace ReviewAggregatorWebApp.Controllers
             _movieRepository = moviesrepository;
         }
 
+        [HttpGet]
         public IActionResult Details(int id)
         {
 

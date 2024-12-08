@@ -4,6 +4,7 @@
     <h1>@(Model.IsEditing ? "Редактировать фильм" : "Создать фильм")</h1>
     <form asp-action="@(Model.IsEditing ? "Edit" : "Create")">
         <input type="hidden" asp-for="Id" />
+
         <div class="form-group">
             <label asp-for="Name"></label>
             <input asp-for="Name" class="form-control" />
@@ -74,7 +75,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Сохранить</button>
-        <a asp-action="Index" class="btn btn-secondary">Отмена</a>
+        <a href="@Url.Action("Filter")" class="btn btn-secondary">Отмена</a>
     </form>
 </div>
 

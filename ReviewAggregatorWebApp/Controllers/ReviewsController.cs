@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
+using System.Security.Claims;
 
 public class ReviewsController : Controller
 {
@@ -25,13 +27,29 @@ public class ReviewsController : Controller
         return Json(new { reviews, totalPages });
     }
 
-    [HttpPost]
     public IActionResult Create([FromBody] Review review)
     {
         if (ModelState.IsValid)
         {
-            _reviewRepository.Create(review);
-            return Json(new { success = true });
+            // Получаем ID пользователя из claims и конвертируем его в int
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdString, out int userId))
+            {
+                review.UserId = userId; // Устанавливаем ID пользователя
+                _reviewRepository.Create(review);
+                return Json(new { success = true });
+            }
+            else
+            {
+                // Обработка ошибки, если ID пользователя не является корректным числом
+                return Json(new { success = false, message = "Invalid user ID." });
+            }
+        }
+        var errors = ModelState.Values.SelectMany(v => v.Errors);
+        foreach (var error in errors)
+        {
+            // Логирование или вывод ошибок
+            Console.WriteLine(error.ErrorMessage);
         }
         return Json(new { success = false });
     }

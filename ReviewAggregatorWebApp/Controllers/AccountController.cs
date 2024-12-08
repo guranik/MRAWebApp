@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.ViewModel;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ReviewAggregatorWebApp.Controllers
@@ -33,7 +35,7 @@ namespace ReviewAggregatorWebApp.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, model.Role);
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    await AddClaimsAsync(user); // Вызов метода для добавления claims
                     return RedirectToAction("Index", "Genres");
                 }
                 foreach (var error in result.Errors)
@@ -43,7 +45,6 @@ namespace ReviewAggregatorWebApp.Controllers
             }
             return View(model);
         }
-
         [HttpGet]
         public IActionResult Login()
         {
@@ -58,7 +59,10 @@ namespace ReviewAggregatorWebApp.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    await AddClaimsAsync(user); // Вызов метода для добавления claims
+
+                    return RedirectToAction("Index", "Genres");
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
@@ -69,6 +73,24 @@ namespace ReviewAggregatorWebApp.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        private async Task AddClaimsAsync(User user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Добавление claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("Login", user.Login),
+                new Claim(ClaimTypes.Role, roles.FirstOrDefault() ?? string.Empty)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, "Login");
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(claimsPrincipal);
         }
     }
 }

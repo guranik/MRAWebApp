@@ -11,6 +11,7 @@ using ReviewAggregatorWebApp.Middleware.ApiResponseData;
 using ReviewAggregatorWebApp.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using Azure;
+using Microsoft.AspNetCore.Identity;
 
 namespace ReviewAggregatorWebApp.Middleware
 {
@@ -236,6 +237,23 @@ namespace ReviewAggregatorWebApp.Middleware
                 }
             }
             return countryList;
+        }
+
+        public async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+            string[] roleNames = { "User ", "Admin" }; // Убедитесь, что названия ролей совпадают с теми, что вы используете в коде
+            IdentityResult roleResult;
+
+            foreach (var roleName in roleNames)
+            {
+                var roleExist = await roleManager.RoleExistsAsync(roleName);
+                if (!roleExist)
+                {
+                    // Создание роли
+                    roleResult = await roleManager.CreateAsync(new IdentityRole<int>(roleName));
+                }
+            }
         }
     }
 }

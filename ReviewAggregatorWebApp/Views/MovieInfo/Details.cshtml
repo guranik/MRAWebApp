@@ -67,6 +67,45 @@
 
 @section Scripts {
     <script>
+
+        function submitReview(movieId) {
+            const reviewText = $('#review-text').val();
+
+            if (selectedRating === 0 || reviewText.trim() === "") {
+                alert("Пожалуйста, выберите рейтинг и введите текст отзыва.");
+                return;
+            }
+
+            const reviewData = {
+                MovieId: movieId,
+                Rating: selectedRating,
+                ReviewText: reviewText
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Create", "Reviews")',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(reviewData),
+                dataType: "json",
+                success: function (data) {
+                    if (data.success) {
+                        alert("Отзыв успешно добавлен!");
+                        loadReviews(movieId, 1); // Reload reviews
+                        $('#review-text').val(""); // Clear the text area
+                        selectedRating = 0; // Reset rating
+                        $('.star').removeClass('selected'); // Reset stars
+                    } else {
+                        alert("Ошибка при добавлении отзыва.");
+                    }
+                },
+                error: function () {
+                    alert("Ошибка при отправке запроса.");
+                }
+            });
+        }
+
+
         let selectedRating = 0;
 
         document.querySelectorAll('.star').forEach(star => {
@@ -80,41 +119,7 @@
                 }
             });
         });
-
-        function submitReview(movieId) {
-            const reviewText = document.getElementById('review-text').value;
-
-            if (selectedRating === 0 || reviewText.trim() === "") {
-                alert("Пожалуйста, выберите рейтинг и введите текст отзыва.");
-                return;
-            }
-
-            const reviewData = {
-                MovieId: movieId,
-                Rating: selectedRating,
-                ReviewText: reviewText
-            };
-
-            fetch('/Reviews/Create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(reviewData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("Отзыв успешно добавлен!");
-                        loadReviews(movieId, 1); // Reload reviews
-                        document.getElementById('review-text').value = ""; // Clear the text area
-                        selectedRating = 0; // Reset rating
-                        document.querySelectorAll('.star').forEach(s => s.classList.remove('selected')); // Reset stars
-                    } else {
-                        alert("Ошибка при добавлении отзыва.");
-                    }
-                });
-        }
+        
 
         let currentPage = 1;
 
