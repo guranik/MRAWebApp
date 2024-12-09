@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
@@ -8,26 +9,18 @@ using System.Collections.Generic;
 
 namespace ReviewAggregatorWebApp.Controllers
 {
-    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
     public class GenresController : Controller
     {
-        private readonly IMemoryCache _cache;
         private readonly IAllGenres _genresRepository;
 
-        public GenresController(IMemoryCache cache, IAllGenres genresRepository)
+        public GenresController(IAllGenres genresRepository)
         {
-            _cache = cache;
             _genresRepository = genresRepository;
         }
 
         public IActionResult Index()
         {
-            if (!_cache.TryGetValue("genres", out List<Genre> genres))
-            {
-                genres = _genresRepository.AllGenres.ToList();
-
-                _cache.Set("genres", genres, TimeSpan.FromSeconds(256));
-            }
+            var genres = _genresRepository.AllGenres.ToList();
 
             return View(genres);
         }
@@ -38,6 +31,7 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(GenreViewModel model)
         {
             if (ModelState.IsValid)
@@ -49,6 +43,7 @@ namespace ReviewAggregatorWebApp.Controllers
             return View(model);
         }
 
+
         public IActionResult Edit(int id)
         {
             var genre = _genresRepository.GetById(id);
@@ -59,6 +54,7 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(GenreViewModel model)
         {
             if (ModelState.IsValid)
@@ -71,6 +67,19 @@ namespace ReviewAggregatorWebApp.Controllers
                 return RedirectToAction("Index");
             }
             return View(model);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult Delete(int id)
+        {
+            var movie = _genresRepository.GetById(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            _genresRepository.Delete(movie);
+            return RedirectToAction("Index");
         }
     }
 }

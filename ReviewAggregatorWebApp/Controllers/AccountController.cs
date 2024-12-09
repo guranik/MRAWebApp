@@ -72,7 +72,7 @@ namespace ReviewAggregatorWebApp.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Genres");
         }
 
         private async Task AddClaimsAsync(User user)

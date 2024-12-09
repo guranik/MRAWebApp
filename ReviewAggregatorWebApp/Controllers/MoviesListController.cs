@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.Interfaces;
@@ -97,6 +98,7 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(MovieViewModel model)
         {
             if (ModelState.IsValid)
@@ -155,6 +157,7 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(MovieViewModel model)
         {
             if (ModelState.IsValid)
@@ -197,6 +200,7 @@ namespace ReviewAggregatorWebApp.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var movie = _moviesRepository.GetById(id);

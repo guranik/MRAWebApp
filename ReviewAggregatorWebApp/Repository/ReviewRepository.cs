@@ -21,6 +21,22 @@ namespace ReviewAggregatorWebApp.Repository
             .Include(x => x.User)
             .Include(x => x.Movie);
 
+        public int GetCountByMovie(int movieId) => _context.Reviews.Where(x => x.MovieId == movieId).Count();
+
+        public PagedList<Review> GetPagedReviews(int movieId, int pageNumber, int pageSize)
+        {
+            IQueryable<Review> reviews = _context.Reviews
+                .Where(x => x.MovieId == movieId)
+                .Include(x => x.User)
+                .Include(x => x.Movie);
+
+            var totalCount = reviews.Count();
+
+            var pagedReviews = reviews.OrderByDescending(x => x.PostDate).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PagedList<Review>(pagedReviews,totalCount,pageNumber,pageSize);
+        }
+
         public Review GetById(int id) => _context.Reviews
             .Include(x => x.User)
             .Include(x => x.Movie)

@@ -7,7 +7,14 @@
             <a class="navbar-brand" href="@Url.Action("Index", "Genres")">Главная</a>
             <div class="d-flex align-items-center">
                 <input type="text" class="form-control me-2" placeholder="Найти фильм" aria-label="Search">
-                <a class="btn btn-outline-success" href="@Url.Action("Login", "Account")" type="button">Войти</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button class="btn btn-secondary" id="logout-button">Выйти</button>
+                }
+                else
+                {
+                    <a class="btn btn-outline-success" href="@Url.Action("Login", "Account")" type="button">Войти</a>
+                }
             </div>
         </div>
     </nav>
@@ -15,4 +22,15 @@
 <div class="container mt-4">
     @RenderBody()
 </div>
-@RenderSection("Scripts", required: false)
+@section Scripts {
+    <script>
+        var logoutButton = document.getElementById('logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function () {
+                if (confirm("Вы уверены, что хотите выйти?")) {
+                    window.location.href = '@Url.Action("Logout", "Account")';
+                }
+            });
+        }
+    </script>
+}

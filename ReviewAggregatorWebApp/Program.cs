@@ -66,7 +66,7 @@ using (var scope = app.Services.CreateScope())
     var databaseInitializer = new DatabaseInitializer(movieRepository, directorRepository, genreRepository, countryRepository, initializationInfo);
     try
     {
-        await databaseInitializer.CreateRoles(services); // Вызов метода создания ролей
+        await databaseInitializer.CreateRoles(services); // Вызов метода создания 
     }
     catch (Exception  ex){ }
     try
@@ -80,8 +80,6 @@ using (var scope = app.Services.CreateScope())
 // Использование middleware для кэширования
 app.UseMiddleware<CachingMiddleware>();
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseStaticFiles();
 
@@ -90,6 +88,8 @@ app.UseSession();
 
 // Добавление маршрутизации MVC (если используется)
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "Filter",
@@ -125,5 +125,10 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Genres}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "reviews",
+    pattern: "Reviews/{action=Index}/{id?}",
+    defaults: new { controller = "Reviews" });
 
 app.Run();

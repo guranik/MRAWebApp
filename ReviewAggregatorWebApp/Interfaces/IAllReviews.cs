@@ -10,6 +10,8 @@ namespace ReviewAggregatorWebApp.Interfaces
     public interface IAllReviews
     {
         IEnumerable<Review> AllReviews { get; }
+        int GetCountByMovie(int movieId);
+        PagedList<Review> GetPagedReviews(int movieId, int pageNumber, int pageSize);
         IEnumerable<Review> GetByMovieId(int movieId);
         Review GetById(int id);
         void Create(Review review);

@@ -1,22 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
+using ReviewAggregatorWebApp.Repository;
 using ReviewAggregatorWebApp.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ReviewAggregatorWebApp.Controllers
 {
-    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
     public class DirectorsController : Controller
     {
-        private readonly IMemoryCache _cache;
         private readonly IAllDirectors _directorsRepository;
 
-        public DirectorsController(IMemoryCache cache, IAllDirectors directorsRepository)
+        public DirectorsController(IAllDirectors directorsRepository)
         {
-            _cache = cache;
             _directorsRepository = directorsRepository;
         }
 
@@ -25,24 +24,20 @@ namespace ReviewAggregatorWebApp.Controllers
             int pageSize = 20;
             var pagedDirectors = _directorsRepository.GetPagedDirectors(pageNumber, pageSize);
 
-            if (!_cache.TryGetValue("directors", out List<Director> directors))
-            {
-                directors = pagedDirectors.Items;
-                _cache.Set("directors", directors, TimeSpan.FromSeconds(256));
-            }
-
             ViewBag.CurrentPage = pagedDirectors.PageNumber;
             ViewBag.TotalPages = pagedDirectors.TotalPages;
 
             return View(pagedDirectors.Items);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View(new DirectorViewModel());
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(DirectorViewModel model)
         {
             if (ModelState.IsValid)
@@ -64,6 +59,7 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(DirectorViewModel model)
         {
             if (ModelState.IsValid)
@@ -76,6 +72,19 @@ namespace ReviewAggregatorWebApp.Controllers
                 return RedirectToAction("Index");
             }
             return View(model);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult Delete(int id)
+        {
+            var movie = _directorsRepository.GetById(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            _directorsRepository.Delete(movie);
+            return RedirectToAction("Index");
         }
     }
 }

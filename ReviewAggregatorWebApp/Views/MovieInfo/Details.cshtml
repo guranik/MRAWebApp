@@ -56,107 +56,44 @@
     <button id="submit-review" onclick="submitReview(@Model.Id)">Отправить отзыв</button>
 </div>
 
+<div id="review-template" style="display: none;">
+    <div class="review" data-review-id="">
+        <h3 class="review-user-name"></h3>
+        <p class="review-text"></p>
+        <p class="review-rating"></p>
+        <p class="review-date"></p>
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div>
+                <button class="btn btn-danger" onclick="confirmDelete(this)">Удалить</button>
+            </div>
+        }
+    </div>
+</div>
+
 <div id="reviews-container">
     <!-- Здесь будут загружаться отзывы -->
 </div>
 
 <div id="pagination">
-    <button id="prev-page" onclick="loadReviews(@Model.Id, 1)">Назад</button>
-    <button id="next-page" onclick="loadReviews(@Model.Id, 2)">Вперед</button>
+    <button id="prev-page" onclick="loadReviews(@Model.Id, currentPage - 1)">Назад</button>
+    <button id="next-page" onclick="loadReviews(@Model.Id, currentPage + 1)">Вперед</button>
 </div>
 
-@section Scripts {
-    <script>
+<div id="movie" data-movie-id="@Model.Id"></div>
+<div id="review-url" data-url="@Url.Action("Create", "Reviews")"></div>
 
-        function submitReview(movieId) {
-            const reviewText = $('#review-text').val();
 
-            if (selectedRating === 0 || reviewText.trim() === "") {
-                alert("Пожалуйста, выберите рейтинг и введите текст отзыва.");
-                return;
-            }
+<script>
+    function confirmDelete(button) {
+        const reviewElement = button.closest('.review');
+        const reviewId = reviewElement.dataset.reviewId;
 
-            const reviewData = {
-                MovieId: movieId,
-                Rating: selectedRating,
-                ReviewText: reviewText
-            };
-
-            $.ajax({
-                type: 'POST',
-                url: '@Url.Action("Create", "Reviews")',
-                contentType: 'application/json; charset=utf-8',
-                data: JSON.stringify(reviewData),
-                dataType: "json",
-                success: function (data) {
-                    if (data.success) {
-                        alert("Отзыв успешно добавлен!");
-                        loadReviews(movieId, 1); // Reload reviews
-                        $('#review-text').val(""); // Clear the text area
-                        selectedRating = 0; // Reset rating
-                        $('.star').removeClass('selected'); // Reset stars
-                    } else {
-                        alert("Ошибка при добавлении отзыва.");
-                    }
-                },
-                error: function () {
-                    alert("Ошибка при отправке запроса.");
-                }
-            });
+        if (confirm("Вы уверены, что хотите удалить этот отзыв?")) {
+            window.location.href = '@Url.Action("Delete", "Reviews")/' + reviewId;
         }
+    }
+</script>
 
-
-        let selectedRating = 0;
-
-        document.querySelectorAll('.star').forEach(star => {
-            star.addEventListener('click', function () {
-                selectedRating = this.getAttribute('data-value');
-                document.querySelectorAll('.star').forEach(s => {
-                    s.classList.remove('selected');
-                });
-                for (let i = 0; i < selectedRating; i++) {
-                    document.querySelectorAll('.star')[i].classList.add('selected');
-                }
-            });
-        });
-        
-
-        let currentPage = 1;
-
-        function loadReviews(movieId, page) {
-            currentPage = page;
-            fetch(`/Reviews/GetReviews?movieId=${movieId}&page=${currentPage}`)
-                .then(response => response.json())
-                .then(data => {
-                    const reviewsContainer = document.getElementById('reviews-container');
-                    reviewsContainer.innerHTML = '';
-
-                    data.reviews.forEach(review => {
-                        const reviewElement = document.createElement('div');
-                        reviewElement.innerHTML = `
-                            <h3>${review.User.Name}</h3>
-                            <p>${review.ReviewText}</p>
-                            <p>Рейтинг: ${review.Rating}</p>
-                            <p>Дата: ${new Date(review.PostDate).toLocaleDateString()}</p>
-                        `;
-                        reviewsContainer.appendChild(reviewElement);
-                    });
-
-                    updatePagination(data.totalPages);
-                });
-        }
-
-        function updatePagination(totalPages) {
-            const prevButton = document.getElementById('prev-page');
-            const nextButton = document.getElementById('next-page');
-
-            prevButton.disabled = currentPage === 1;
-            nextButton.disabled = currentPage === totalPages;
-        }
-
-        // Загрузите отзывы при первой загрузке страницы
-        document.addEventListener('DOMContentLoaded', function () {
-            loadReviews(@Model.Id, currentPage);
-        });
-    </script>
-}
+<script src="~/js/MovieInfo.js"></script>

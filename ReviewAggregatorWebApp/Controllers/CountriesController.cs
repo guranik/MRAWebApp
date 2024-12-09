@@ -1,22 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
+using ReviewAggregatorWebApp.Repository;
 using ReviewAggregatorWebApp.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace ReviewAggregatorWebApp.Controllers
 {
-    [ResponseCache(Duration = 256, Location = ResponseCacheLocation.Any)]
     public class CountriesController : Controller
     {
-        private readonly IMemoryCache _cache;
         private readonly IAllCountries _countriesRepository;
 
-        public CountriesController(IMemoryCache cache, IAllCountries countriesRepository)
+        public CountriesController(IAllCountries countriesRepository)
         {
-            _cache = cache;
             _countriesRepository = countriesRepository;
         }
 
@@ -24,12 +23,6 @@ namespace ReviewAggregatorWebApp.Controllers
         {
             int pageSize = 20;
             var pagedCountries = _countriesRepository.GetPagedCountries(pageNumber, pageSize);
-
-            if (!_cache.TryGetValue("countries", out List<Country> countries))
-            {
-                countries = pagedCountries.Items;
-                _cache.Set("countries", countries, TimeSpan.FromSeconds(256));
-            }
 
             ViewBag.CurrentPage = pagedCountries.PageNumber;
             ViewBag.TotalPages = pagedCountries.TotalPages;
@@ -43,6 +36,7 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(CountryViewModel model)
         {
             if (ModelState.IsValid)
@@ -64,6 +58,7 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(CountryViewModel model)
         {
             if (ModelState.IsValid)
@@ -76,6 +71,19 @@ namespace ReviewAggregatorWebApp.Controllers
                 return RedirectToAction("Index");
             }
             return View(model);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult Delete(int id)
+        {
+            var movie = _countriesRepository.GetById(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            _countriesRepository.Delete(movie);
+            return RedirectToAction("Index");
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ReviewAggregatorWebApp.DTOs;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
+using ReviewAggregatorWebApp.Repository;
 using System.Security.Claims;
 
 public class ReviewsController : Controller
@@ -14,19 +16,26 @@ public class ReviewsController : Controller
     }
 
     [HttpGet]
-    public IActionResult GetReviews(int movieId, int page = 1, int pageSize = 10)
+    public IActionResult GetReviews(int movieId, int page = 1)
     {
-        var reviews = _reviewRepository.GetByMovieId(movieId)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
+        var reviews = _reviewRepository.GetPagedReviews(movieId, page, 10);
 
-        var totalReviews = _reviewRepository.GetByMovieId(movieId).Count();
-        var totalPages = (int)Math.Ceiling((double)totalReviews / pageSize);
+        var reviewDtos = reviews.Items.Select(r => new ReviewDto
+        {
+            Id = r.Id,
+            UserId = r.UserId,
+            UserName = r.User.Login,
+            MovieId = r.MovieId,
+            PostDate = r.PostDate,
+            Rating = r.Rating,
+            ReviewText = r.ReviewText
+        }).ToList();
 
-        return Json(new { reviews, totalPages });
+        return Json(new { reviews = reviewDtos, reviews.PageNumber, reviews.TotalPages });
     }
 
+    [HttpPost]
+    [Authorize]
     public IActionResult Create([FromBody] Review review)
     {
         if (ModelState.IsValid)
@@ -36,6 +45,7 @@ public class ReviewsController : Controller
             if (int.TryParse(userIdString, out int userId))
             {
                 review.UserId = userId; // Устанавливаем ID пользователя
+                review.PostDate = DateTime.Now;
                 _reviewRepository.Create(review);
                 return Json(new { success = true });
             }
@@ -52,5 +62,18 @@ public class ReviewsController : Controller
             Console.WriteLine(error.ErrorMessage);
         }
         return Json(new { success = false });
+    }
+
+    [Authorize(Roles = "Admin")]
+    public IActionResult Delete(int id)
+    {
+        var review = _reviewRepository.GetById(id);
+        if (review == null)
+        {
+            return NotFound();
+        }
+
+        _reviewRepository.Delete(review);
+        return RedirectToAction("Details", "MovieInfo", new { id = review.MovieId });
     }
 }

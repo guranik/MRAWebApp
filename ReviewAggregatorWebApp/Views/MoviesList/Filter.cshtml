@@ -82,9 +82,12 @@
     </select>
 </div>
 
-<div>
-    <a asp-action="Create" class="btn btn-primary">Добавить фильм</a>
-</div>
+@if (User.IsInRole("Admin"))
+{
+    <div>
+        <a asp-action="Create" class="btn btn-primary">Добавить фильм</a>
+    </div>
+}
 
 @if (Model != null && Model.Any())
 {
@@ -105,10 +108,13 @@
                         Страны: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
                     </a>
 
-                    <div>
-                        <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary">Изменить</a>
-                        <button class="btn btn-danger" onclick="confirmDelete(@movie.Id)">Удалить</button>
-                    </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div>
+                            <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary">Изменить</a>
+                            <button class="btn btn-danger" onclick="confirmDelete(@movie.Id)">Удалить</button>
+                        </div>
+                    }
                 </div>
             </li>
         }
