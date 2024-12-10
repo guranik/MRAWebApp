@@ -1,4 +1,5 @@
-﻿using ReviewAggregatorWebApp.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,19 @@ namespace ReviewAggregatorWebApp.Repository
 
             var totalCount = _context.Directors.Count();
             return new PagedList<Director>(directors, totalCount, pageNumber, pageSize);
+        }
+
+        public IEnumerable<Director> GetDirectorsByNamePrefix(string namePrefix)
+        {
+            if (string.IsNullOrWhiteSpace(namePrefix))
+            {
+                return null;
+            }
+
+            return _context.Directors
+                .Where(m => m.Name.StartsWith(namePrefix.ToLower()))
+                .Take(8)
+                .ToList();
         }
 
         public Director GetById(int id) => _context.Directors.Find(id)

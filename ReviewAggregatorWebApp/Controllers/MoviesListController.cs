@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using ReviewAggregatorWebApp.DTOs;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.Repository;
@@ -21,40 +22,35 @@ namespace ReviewAggregatorWebApp.Controllers
         private readonly IAllCountries _countriesRepository;
         private readonly IAllGenres _genresRepository;
         private readonly IAllDirectors _directorsRepository;
+        private readonly IAllYears _yearsRepository;
+        
 
         public MoviesListController(
             IMemoryCache cache, IAllMovies moviesRepository, 
             IAllCountries countriesRepository, IAllGenres genresRepository, 
-            IAllDirectors directorsRepository)
+            IAllDirectors directorsRepository, IAllYears yearsRepository)
         {
             _cache = cache;
             _moviesRepository = moviesRepository;
             _countriesRepository = countriesRepository;
             _genresRepository = genresRepository;
             _directorsRepository = directorsRepository;
+            _yearsRepository = yearsRepository;
         }
 
         public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating", int pageNumber = 1)
         {
-            if (!_cache.TryGetValue("genres", out List<Genre>
-            genres))
+            if(!_cache.TryGetValue("genres", out var genres))
             {
-                return NotFound("Genres not found in cache.");
+                throw new Exception("Жанры не найдены в кэше.");
             }
-            if (!_cache.TryGetValue("countries", out List<Country>
-            countries))
+            if (!_cache.TryGetValue("years", out var years))
             {
-                return NotFound("Countries not found in cache.");
+                throw new Exception("Годы не найдены в кэше.");
             }
-            if (!_cache.TryGetValue("directors", out List<Director>
-            directors))
+            if(!_cache.TryGetValue("countries", out var countries))
             {
-                return NotFound("Directors not found in cache.");
-            }
-            if (!_cache.TryGetValue("years", out List<int>
-            years))
-            {
-                return NotFound("Years not found in cache.");
+                throw new Exception("Страны не найдены в кэше.");
             }
 
             if (!string.IsNullOrEmpty(sortBy))
@@ -72,7 +68,6 @@ namespace ReviewAggregatorWebApp.Controllers
             // Передаем данные для фильтров в представление
             ViewBag.Genres = genres;
             ViewBag.Years = years;
-            ViewBag.Directors = directors;
             ViewBag.Countries = countries;
 
             ViewBag.Year = year;
@@ -130,6 +125,25 @@ namespace ReviewAggregatorWebApp.Controllers
             model.Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name");
             model.Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name");
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult GetMoviesByTitlePrefix(string titlePrefix)
+        {
+            if (string.IsNullOrWhiteSpace(titlePrefix))
+            {
+                return BadRequest("Title prefix cannot be empty.");
+            }
+
+            var movies = _moviesRepository.GetMoviesByTitlePrefix(titlePrefix);
+
+            var movieDtos = movies.Select(m => new MovieDto
+            {
+                Id = m.Id,
+                Name = m.Name
+            });
+
+            return Json(movieDtos);
         }
 
         public IActionResult Edit(int id)
@@ -210,7 +224,7 @@ namespace ReviewAggregatorWebApp.Controllers
             }
 
             _moviesRepository.Delete(movie);
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Genres");
         }
     }
 }

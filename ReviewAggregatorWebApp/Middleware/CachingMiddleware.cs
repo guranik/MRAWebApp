@@ -34,7 +34,7 @@ namespace ReviewAggregatorWebApp.Middleware
                 var yearRepository = scope.ServiceProvider.GetRequiredService<IAllYears>();
 
                 // Кэширование данных из каждой таблицы последовательно
-                await CacheData("countries", countryRepository.AllCountries.AsQueryable().Take(20).ToListAsync());
+                await CacheData("countries", countryRepository.AllCountries.AsQueryable().Take(40).ToListAsync());
                 await CacheData("directors", directorRepository.AllDirectors.AsQueryable().Take(20).ToListAsync());
                 await CacheData("genres", genreRepository.AllGenres.AsQueryable().Take(40).ToListAsync());
                 await CacheData("years", Task.FromResult(yearRepository.AllYears.ToList()));

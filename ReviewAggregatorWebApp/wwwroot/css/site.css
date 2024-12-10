@@ -126,3 +126,25 @@ body {
         .checkboxes label:hover {
             background-color: #1e90ff;
         }
+
+   /* Поле поиска фильмов */
+.suggestions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: white;
+    z-index: 1000;
+}
+
+    .suggestions-list li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+        .suggestions-list li:hover {
+            background-color: #f0f0f0;
+        }

@@ -3,42 +3,50 @@
     Layout = "~/Views/Shared/MainLayout.cshtml";
 }
 <h1>@Model.Name</h1>
-<p>
-    Режиссер:
-    @if (Model.Director != null)
-    {
-        <a href="@Url.Action("Filter", "MoviesList", new { director = Model.Director.Name, sortBy = "rating" })">@Model.Director.Name</a>
-    }
-    else
-    {
-        <span>–</span>
-    }
-</p>
-<p>Год премьеры: <a href="@Url.Action("Filter", "MoviesList", new { year = Model.ReleaseDate.Year, sortBy = "rating" })">@Model.ReleaseDate.Year</a></p>
-<p>
-    Страны:
-    @foreach (var country in Model.Countries)
-    {
-        <a href="@Url.Action("Filter", "MoviesList", new { country = country.Name, sortBy = "rating" })">@country.Name</a>
-        @if (country != Model.Countries.Last())
-        {
-            <span>, </span>
-        }
-    }
-</p>
-<p>
-    Жанры:
-    @foreach (var genre in Model.Genres)
-    {
-        <a href="@Url.Action("Filter", "MoviesList", new { genre = genre.Name, sortBy = "rating" })">@genre.Name</a>
-        @if (genre != Model.Genres.Last())
-        {
-            <span>, </span>
-        }
-    }
-</p>
-<p>Рейтинг: @Model.Rating</p>
-<p>Постер: <img src="@Model.PosterLink" alt="@Model.Name" /></p>
+
+<div style="display: flex; align-items: flex-start;">
+    <div style="margin-right: 20px;">
+        <img src="@Model.PosterLink" alt="@Model.Name" style="max-width: 200px;" />
+    </div>
+
+    <div>
+        <p>
+            Режиссер:
+            @if (Model.Director != null)
+            {
+                <a href="@Url.Action("Filter", "MoviesList", new { director = Model.Director.Name, sortBy = "rating" })">@Model.Director.Name</a>
+            }
+            else
+            {
+                <span>–</span>
+            }
+        </p>
+        <p>Год премьеры: <a href="@Url.Action("Filter", "MoviesList", new { year = Model.ReleaseDate.Year, sortBy = "rating" })">@Model.ReleaseDate.Year</a></p>
+        <p>
+            Страны:
+            @foreach (var country in Model.Countries)
+            {
+                <a href="@Url.Action("Filter", "MoviesList", new { country = country.Name, sortBy = "rating" })">@country.Name</a>
+                @if (country != Model.Countries.Last())
+                {
+                    <span>, </span>
+                }
+            }
+        </p>
+        <p>
+            Жанры:
+            @foreach (var genre in Model.Genres)
+            {
+                <a href="@Url.Action("Filter", "MoviesList", new { genre = genre.Name, sortBy = "rating" })">@genre.Name</a>
+                @if (genre != Model.Genres.Last())
+                {
+                    <span>, </span>
+                }
+            }
+        </p>
+        <p>Рейтинг: @Model.Rating</p>
+    </div>
+</div>
 
 <div id="review-input">
     <h2>Оставьте свой отзыв</h2>
@@ -83,7 +91,6 @@
 
 <div id="movie" data-movie-id="@Model.Id"></div>
 <div id="review-url" data-url="@Url.Action("Create", "Reviews")"></div>
-
 
 <script>
     function confirmDelete(button) {

@@ -12,6 +12,7 @@ namespace ReviewAggregatorWebApp.Interfaces
         IEnumerable<Movie> AllMovies { get; }
         int GetTotalCount();
         PagedList<Movie> GetPagedMovies(string genre, string year, string director, string country, string sortBy, int pageNumber, int pageSize);
+        IEnumerable<Movie> GetMoviesByTitlePrefix(string titlePrefix);
         Movie GetById(int id);
         void Create(Movie movie);
         void Update(Movie movie);

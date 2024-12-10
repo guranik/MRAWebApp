@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using ReviewAggregatorWebApp.DTOs;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.Repository;
@@ -28,6 +29,24 @@ namespace ReviewAggregatorWebApp.Controllers
             ViewBag.TotalPages = pagedDirectors.TotalPages;
 
             return View(pagedDirectors.Items);
+        }
+
+        [HttpGet]
+        public IActionResult GetDirectorsByNamePrefix(string namePrefix)
+        {
+            if (string.IsNullOrWhiteSpace(namePrefix))
+            {
+                return BadRequest("Name prefix cannot be empty.");
+            }
+
+            var directors = _directorsRepository.GetDirectorsByNamePrefix(namePrefix);
+
+            var directorDtos = directors.Select(d => new DirectorDto
+            {
+                Name = d.Name
+            });
+
+            return Json(directorDtos);
         }
 
         [Authorize(Roles = "Admin")]

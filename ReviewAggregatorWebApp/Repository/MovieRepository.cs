@@ -68,6 +68,22 @@ namespace ReviewAggregatorWebApp.Repository
             return new PagedList<Movie>(pagedMovies, totalCount, pageNumber, pageSize);
         }
 
+        public IEnumerable<Movie> GetMoviesByTitlePrefix(string titlePrefix)
+        {
+            if (string.IsNullOrWhiteSpace(titlePrefix))
+            {
+                return null;
+            }
+
+            return _context.Movies
+                .Include(x => x.Director)
+                .Include(x => x.Genres)
+                .Include(x => x.Countries)
+                .Where(m => m.Name.StartsWith(titlePrefix.ToLower()))
+                .Take(20)
+                .ToList();
+        }
+
         public Movie GetById(int id) => _context.Movies
             .Include(x => x.Director)
             .Include(x => x.Genres)

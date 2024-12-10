@@ -50,13 +50,8 @@
 
         <div class="form-group">
             <label for="director">Режиссер:</label>
-            <select id="director" name="director" class="form-control">
-                <option value="">Все</option>
-                @foreach (var d in directors)
-                {
-                    <option value="@d" selected="@(d.ToString() == director ? "selected" : null)">@d</option>
-                }
-            </select>
+            <input type="text" class="form-control" id="director" name="director" placeholder="Все" value="@director" aria-label="Search" list="directorList">
+            <datalist id="directorList"></datalist> <!-- Дата-список для отображения результатов -->
         </div>
 
         <div class="form-group">
@@ -94,28 +89,32 @@
     <ul>
         @foreach (var movie in Model)
         {
-            <li class="movie-item">
-                <div class="movie-info">
-                    <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })" class="movie-link">
+            <li class="movie-item" style="display: flex; align-items: flex-start;">
+                <div class="movie-poster" style="margin-right: 15px; height: 150px; overflow: hidden;">
+                    <img src="@movie.PosterLink" alt="@movie.Name" style="height: 100%; width: auto; display: block; margin: auto; font-size: 8px;" onerror="this.onerror=null; this.src='path/to/placeholder-image.jpg';" />
+                </div>
+
+                <div class="movie-info" style="flex: 2; max-width: 600px;">
+                    <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })" class="movie-link" style="display: block; max-width: 600px;">
                         <strong>
                             @movie.Name
                         </strong> - @(movie.ReleaseDate.Year.ToString())
                         <br />
                         Жанры: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
                         <br />
-                        Режиссер: @(movie.Director?.Name ?? "–")
+                        Режиссер: <span style="font-size: 0.9em;">@(movie.Director?.Name ?? "–")</span>
                         <br />
                         Страны: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
                     </a>
-
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <div>
-                            <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary">Изменить</a>
-                            <button class="btn btn-danger" onclick="confirmDelete(@movie.Id)">Удалить</button>
-                        </div>
-                    }
                 </div>
+
+                @if (User .IsInRole("Admin"))
+                {
+                    <div style="margin-left: 15px; display: flex; flex-direction: column; justify-content: center;">
+                        <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary">Изменить</a>
+                        <button class="btn btn-danger" onclick="confirmDelete(@movie.Id)">Удалить</button>
+                    </div>
+                }
             </li>
         }
     </ul>
@@ -146,18 +145,19 @@ else
             <a href="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder, pageNumber = ViewBag.CurrentPage - 1 })" class="btn btn-secondary" style="margin: 0 3px;">@(ViewBag.CurrentPage - 1)</a>
         }
 
-        // Текущая страница
-        <form method="get" class="d-inline-block" style="margin: 0 3px;">
-            <input type="hidden" name="genre" value="@genre" />
-            <input type="hidden" name="year" value="@year" />
-            <input type="hidden" name="director" value="@director" />
-            <input type="hidden" name="country" value="@country" />
-            <input type="hidden" name="sortBy" value="@sortOrder" />
-            <div class="input-group">
-                <input type="number" name="pageNumber" min="1" max="@ViewBag.TotalPages" value="@ViewBag.CurrentPage" />
-                <button type="submit" class="btn btn-primary">Перейти</button>
-            </div>
-        </form>
+        // Обертка для поля ввода и кнопок
+        <div style="display: flex; align-items: center; margin: 0 3px;">
+            <form method="get" class="d-inline-block" style="margin: 0;">
+                <input type="hidden" name="genre" value="@genre" />
+                <input type="hidden" name="year" value="@year" />
+                <input type="hidden" name="director" value="@director" />
+                <input type="hidden" name="country" value="@country" />
+                <input type="hidden" name="sortBy" value="@sortOrder" />
+                <div class="input-group">
+                    <input type="number" name="pageNumber" min="1" max="@ViewBag.TotalPages" value="@ViewBag.CurrentPage" style="text-align: center;" />
+                </div>
+            </form>
+        </div>
 
         // Кнопка для следующей страницы
         if (ViewBag.CurrentPage < ViewBag.TotalPages - 1)
@@ -180,6 +180,29 @@ else
 </div>
 
 
+<script>
+    $(document).ready(function () {
+        $('#director').on('input', function () {
+            var namePrefix = $(this).val();
+                if (namePrefix.length > 0) {
+                $.get('/Directors/GetDirectorsByNamePrefix', { namePrefix: namePrefix }, function (data) {
+                    $('#directorList').empty(); // Очистить предыдущие результаты
+                    if (data.length > 0) {
+                        $.each(data, function (index, director) {
+                            $('#directorList').append(
+                                `<option value="${director.name}">${director.name}</option>`
+                                );
+                            });
+                        } else {
+                            $('#directorList').append('<option value="Режиссеры не найдены." disabled></option>');
+                    }
+                });
+            } else {
+                $('#directorList').empty(); // Очистить результаты, если ввод пустой
+            }
+            });
+        });
+</script>
 
 <script>
     function goToPage() {

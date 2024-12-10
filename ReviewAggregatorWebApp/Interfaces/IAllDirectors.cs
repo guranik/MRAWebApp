@@ -12,6 +12,7 @@ namespace ReviewAggregatorWebApp.Interfaces
         IEnumerable<Director> AllDirectors { get; }
         int GetTotalCount();
         PagedList<Director> GetPagedDirectors(int pageNumber, int pageSize);
+        IEnumerable<Director> GetDirectorsByNamePrefix(string namePrefix);
         Director GetById(int id);
         void Create(Director director);
         void Update(Director director);
