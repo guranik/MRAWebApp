@@ -62,8 +62,13 @@ namespace ReviewAggregatorWebApp.Controllers
                 sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
             }
 
-            var filteredMovies = _moviesRepository.GetPagedMovies(genre, year, director, country, sortBy, pageNumber, 15);  
+            HttpContext.Session.SetString("FilterGenre", genre);
+            HttpContext.Session.SetString("FilterYear", year);
+            HttpContext.Session.SetString("FilterDirector", director);
+            HttpContext.Session.SetString("FilterCountry", country);
+            HttpContext.Session.SetInt32("CurrentPage", pageNumber);
 
+            var filteredMovies = _moviesRepository.GetPagedMovies(genre, year, director, country, sortBy, pageNumber, 15);  
 
             // Передаем данные для фильтров в представление
             ViewBag.Genres = genres;
@@ -116,7 +121,7 @@ namespace ReviewAggregatorWebApp.Controllers
                 else
                 {
                     _moviesRepository.Create(movie);
-                    return RedirectToAction("Filter");
+                    return RedirectWithSession();
                 }
             }
 
@@ -195,7 +200,7 @@ namespace ReviewAggregatorWebApp.Controllers
                 else
                 {
                     _moviesRepository.Update(existingMovie);
-                    return RedirectToAction("Filter");
+                    return RedirectWithSession();
                 }
             }
 
@@ -224,7 +229,19 @@ namespace ReviewAggregatorWebApp.Controllers
             }
 
             _moviesRepository.Delete(movie);
-            return RedirectToAction("Index","Genres");
+            return RedirectWithSession();
+        }
+
+        private IActionResult RedirectWithSession()
+        {
+            var genre = HttpContext.Session.GetString("FilterGenre") ?? "";
+            var year = HttpContext.Session.GetString("FilterYear") ?? "";
+            var director = HttpContext.Session.GetString("FilterDirector") ?? "";
+            var country = HttpContext.Session.GetString("FilterCountry") ?? "";
+            var sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
+            var pageNumber = HttpContext.Session.GetInt32("CurrentPage") ?? 1;
+
+            return RedirectToAction("Filter", new { genre, year, director, country, sortBy, pageNumber });
         }
     }
 }
