@@ -4,7 +4,6 @@ using ReviewAggregatorWebApp.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ReviewAggregatorWebApp.Models;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text;
 using ReviewAggregatorWebApp.Interfaces;
