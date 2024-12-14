@@ -53,7 +53,8 @@ public partial class Db8428Context : IdentityDbContext<User, IdentityRole<int>, 
         {
             Password = secretPass,
             UserID = secretUser
-        };
+        }
+        ;
 
         connectionString = sqlConnectionStringBuilder.ConnectionString;
 

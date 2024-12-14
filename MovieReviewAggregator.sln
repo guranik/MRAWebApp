@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewAggregatorWebApp", "ReviewAggregatorWebApp\ReviewAggregatorWebApp.csproj", "{6106FBB4-0F77-498A-9E7C-64D991A42E94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewAggregatorWebApp", "ReviewAggregatorWebApp\ReviewAggregatorWebApp.csproj", "{6106FBB4-0F77-498A-9E7C-64D991A42E94}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewAggregatorTests", "ReviewAggregatorTests\ReviewAggregatorTests.csproj", "{E4ADFB35-60F6-4E81-B99B-5AB354D3F7C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6106FBB4-0F77-498A-9E7C-64D991A42E94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6106FBB4-0F77-498A-9E7C-64D991A42E94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6106FBB4-0F77-498A-9E7C-64D991A42E94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4ADFB35-60F6-4E81-B99B-5AB354D3F7C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4ADFB35-60F6-4E81-B99B-5AB354D3F7C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4ADFB35-60F6-4E81-B99B-5AB354D3F7C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4ADFB35-60F6-4E81-B99B-5AB354D3F7C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
