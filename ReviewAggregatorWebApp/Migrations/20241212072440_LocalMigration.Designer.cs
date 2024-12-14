@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReviewAggregatorWebApp.Model;
 
@@ -11,9 +12,11 @@ using ReviewAggregatorWebApp.Model;
 namespace ReviewAggregatorWebApp.Migrations
 {
     [DbContext(typeof(Db8428Context))]
-    partial class Db8428ContextModelSnapshot : ModelSnapshot
+    [Migration("20241212072440_LocalMigration")]
+    partial class LocalMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

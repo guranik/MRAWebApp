@@ -62,7 +62,7 @@ namespace ReviewAggregatorWebApp.Middleware
 
         public async Task InitializeAsync()
         {
-            int startPage = ++_initInfo.LastProcessedPage;
+            int startPage = _initInfo.LastProcessedPage + 150;
             if (_initInfo.LastRequestDate.Date != DateTime.Now.Date) _initInfo.RemainingRequests = 195;
             var movieIds = await GetMovieIdsAsync(startPage);
          
@@ -89,7 +89,7 @@ namespace ReviewAggregatorWebApp.Middleware
 
             do
             {
-                var jsonResponse = await FetchDataAsync($"{BaseUrl}/v1.4/movie?year=2020&limit=50&page={currentPage}", currentPage);
+                var jsonResponse = await FetchDataAsync($"{BaseUrl}/v1.4/movie?year=2021&limit=50&page={currentPage}", currentPage);
                 var result = JsonConvert.DeserializeObject<ApiResponse>(jsonResponse);
 
                 movieIds.AddRange(result.Docs.Select(m => m.Id));

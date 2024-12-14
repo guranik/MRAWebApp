@@ -85,7 +85,7 @@ function updatePagination(totalPages) {
     const nextButton = document.getElementById('next-page');
 
     prevButton.disabled = currentPage === 1;
-    nextButton.disabled = currentPage === totalPages;
+    nextButton.disabled = currentPage >= totalPages;
 }
 
 // При загрузке страницы
