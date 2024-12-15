@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ReviewAggregatorWebApp.BusinessLogic;
 using ReviewAggregatorWebApp.DTOs;
 using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Model;
@@ -9,10 +10,12 @@ using System.Security.Claims;
 public class ReviewsController : Controller
 {
     private readonly IAllReviews _reviewRepository;
+    private readonly IAllMovies _movieRepository;
 
-    public ReviewsController(IAllReviews reviewRepository)
+    public ReviewsController(IAllReviews reviewRepository, IAllMovies movieRepository)
     {
         _reviewRepository = reviewRepository;
+        _movieRepository = movieRepository;
     }
 
     [HttpGet]
@@ -47,6 +50,9 @@ public class ReviewsController : Controller
                 review.UserId = userId; // Устанавливаем ID пользователя
                 review.PostDate = DateTime.Now;
                 _reviewRepository.Create(review);
+
+                IRatingService ratingService = new RatingService(_reviewRepository, _movieRepository);
+                ratingService.CalculateRating(review.MovieId);
                 return Json(new { success = true });
             }
             else

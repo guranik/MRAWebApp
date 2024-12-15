@@ -21,7 +21,8 @@ public partial class Movie
 
     [Required(ErrorMessage = "Рейтинг обязателен для заполнения.")]
     [Range(0, 10, ErrorMessage = "Рейтинг должен быть в диапазоне от 0 до 10.")]
-    public decimal Rating { get; set; }
+    public decimal KpRating { get; set; }
+    public decimal? Rating { get; set; }
 
     public virtual Director? Director { get; set; }
 

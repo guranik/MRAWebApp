@@ -109,7 +109,7 @@ namespace ReviewAggregatorWebApp.Controllers
                     PosterLink = model.PosterLink,
                     DirectorId = model.DirectorId,
                     ReleaseDate = model.ReleaseDate,
-                    Rating = model.Rating,
+                    Rating = null,
                     Countries = model.CountryIds.Select(id => _countriesRepository.GetById(id)).ToList(),
                     Genres = model.GenreIds.Select(id => _genresRepository.GetById(id)).ToList()
                 };
@@ -163,7 +163,6 @@ namespace ReviewAggregatorWebApp.Controllers
                 PosterLink = movie.PosterLink,
                 DirectorId = movie.DirectorId,
                 ReleaseDate = movie.ReleaseDate,
-                Rating = movie.Rating,
                 CountryIds = movie.Countries.Select(c => c.Id).ToList(),
                 GenreIds = movie.Genres.Select(g => g.Id).ToList(),
                 Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name"),
@@ -188,7 +187,6 @@ namespace ReviewAggregatorWebApp.Controllers
                 existingMovie.PosterLink = model.PosterLink;
                 existingMovie.DirectorId = model.DirectorId;
                 existingMovie.ReleaseDate = model.ReleaseDate;
-                existingMovie.Rating = model.Rating;
 
                 existingMovie.Countries = model.CountryIds.Select(id => _countriesRepository.GetById(id)).ToList();
                 existingMovie.Genres = model.GenreIds.Select(id => _genresRepository.GetById(id)).ToList();

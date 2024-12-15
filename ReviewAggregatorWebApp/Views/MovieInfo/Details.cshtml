@@ -44,7 +44,13 @@
                 }
             }
         </p>
-        <p>Рейтинг: @Model.Rating</p>
+        <p>Рейтинг Kinopoisk: @Model.KpRating</p>
+        @if (@Model.Rating != null)
+        {
+            <div>
+                <p>Рейтинг Отзывов: @(Model.Rating.ToString())</p>
+            </div>
+        }
     </div>
 </div>
 

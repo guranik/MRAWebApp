@@ -20,9 +20,6 @@ namespace ReviewAggregatorWebApp.ViewModel
         [DataType(DataType.Date)]
         public DateTime ReleaseDate { get; set; } // Дата выпуска фильма
 
-        [Required(ErrorMessage = "Рейтинг обязателен для заполнения.")]
-        [Range(0, 10, ErrorMessage = "Рейтинг должен быть в диапазоне от 0 до 10.")]
-        public decimal Rating { get; set; } // Рейтинг фильма
 
         // Списки для выбора
         public List<int> CountryIds { get; set; } = new List<int>(); // Список идентификаторов стран

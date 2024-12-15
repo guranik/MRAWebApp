@@ -100,11 +100,19 @@
                             @movie.Name
                         </strong> - @(movie.ReleaseDate.Year.ToString())
                         <br />
-                        Жанры: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
+                        Рейтинг Kp: @(movie.KpRating.ToString())
+                        @if(movie.Rating != null)
+                        {
+                            <div>
+                                Рейтинг Отзывов: @(movie.Rating.ToString()) / 5
+                            </div>
+                        }
                         <br />
-                        Режиссер: <span style="font-size: 0.9em;">@(movie.Director?.Name ?? "–")</span>
+                        Жанр: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
                         <br />
-                        Страны: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
+                        Режиссер: <span>@(movie.Director?.Name ?? "–")</span>
+                        <br />
+                        Страна: @string.Join(", ", movie.Countries?.Select(c => c.Name) ?? new List<string> { "-" })
                     </a>
                 </div>
 
