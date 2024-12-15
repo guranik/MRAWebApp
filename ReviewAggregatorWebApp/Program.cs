@@ -6,12 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Caching.Memory;
 using System.Text;
-using ReviewAggregatorWebApp.Interfaces;
 using ReviewAggregatorWebApp.Repository;
 using Microsoft.Extensions.Configuration;
 using ReviewAggregatorWebApp.Middleware.ApiResponseData;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Identity;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);

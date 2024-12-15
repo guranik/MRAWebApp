@@ -1,13 +1,14 @@
-﻿using ReviewAggregatorWebApp.Interfaces;
+﻿using ReviewAggregatorWebApp.Interfaces.BusinessLogic;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Model;
 
 namespace ReviewAggregatorWebApp.BusinessLogic
 {
-    public class RatingService : IRatingService
+    public class RatingLogic : IRatingService
     {
         private IAllMovies _movieRepository;
         private IAllReviews _reviewRepository;
-        public RatingService(IAllReviews reviewRepository, IAllMovies movierepository) 
+        public RatingLogic(IAllReviews reviewRepository, IAllMovies movierepository) 
         {
             _movieRepository = movierepository;
             _reviewRepository = reviewRepository;

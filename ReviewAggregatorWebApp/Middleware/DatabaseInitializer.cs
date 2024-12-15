@@ -8,10 +8,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using ReviewAggregatorWebApp.Middleware.ApiResponseData;
-using ReviewAggregatorWebApp.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using Azure;
 using Microsoft.AspNetCore.Identity;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 
 namespace ReviewAggregatorWebApp.Middleware
 {

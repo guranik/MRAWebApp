@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ReviewAggregatorWebApp.Interfaces
+namespace ReviewAggregatorWebApp.Interfaces.Repositories
 {
     public interface IAllUsers
     {

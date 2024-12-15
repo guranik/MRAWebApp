@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ReviewAggregatorWebApp.Model;
 using Microsoft.EntityFrameworkCore;
-using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 
 namespace ReviewAggregatorWebApp.Middleware
 {
@@ -34,9 +34,9 @@ namespace ReviewAggregatorWebApp.Middleware
                 var yearRepository = scope.ServiceProvider.GetRequiredService<IAllYears>();
 
                 // Кэширование данных из каждой таблицы последовательно
-                await CacheData("countries", countryRepository.AllCountries.AsQueryable().Take(40).ToListAsync());
+                await CacheData("countries", countryRepository.AllCountries.AsQueryable().ToListAsync());
                 await CacheData("directors", directorRepository.AllDirectors.AsQueryable().Take(20).ToListAsync());
-                await CacheData("genres", genreRepository.AllGenres.AsQueryable().Take(40).ToListAsync());
+                await CacheData("genres", genreRepository.AllGenres.AsQueryable().ToListAsync());
                 await CacheData("years", Task.FromResult(yearRepository.AllYears.ToList()));
             }
 

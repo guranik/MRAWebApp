@@ -1,11 +1,11 @@
-﻿using ReviewAggregatorWebApp.Interfaces;
-using ReviewAggregatorWebApp.Model;
+﻿using ReviewAggregatorWebApp.Model;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 
 namespace ReviewAggregatorWebApp.Repository
 {

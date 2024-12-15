@@ -1,6 +1,6 @@
 ﻿using ReviewAggregatorWebApp.Model;
 
-namespace ReviewAggregatorWebApp.Interfaces
+namespace ReviewAggregatorWebApp.Interfaces.Repositories
 {
     public interface IAllYears
     {

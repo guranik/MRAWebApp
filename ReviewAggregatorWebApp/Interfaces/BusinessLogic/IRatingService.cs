@@ -1,4 +1,4 @@
-﻿namespace ReviewAggregatorWebApp.Interfaces
+﻿namespace ReviewAggregatorWebApp.Interfaces.BusinessLogic
 {
     public interface IRatingService
     {

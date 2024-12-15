@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Model;
 using System;
 using System.Collections.Generic;

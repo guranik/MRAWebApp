@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.DTOs;
-using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.Repository;
 using ReviewAggregatorWebApp.ViewModel;

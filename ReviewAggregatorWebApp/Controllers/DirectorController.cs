@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using ReviewAggregatorWebApp.DTOs;
-using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.Repository;
 using ReviewAggregatorWebApp.ViewModel;
@@ -14,21 +14,43 @@ namespace ReviewAggregatorWebApp.Controllers
     public class DirectorsController : Controller
     {
         private readonly IAllDirectors _directorsRepository;
+        private readonly IMemoryCache _cache;
 
-        public DirectorsController(IAllDirectors directorsRepository)
+        public DirectorsController(IAllDirectors directorsRepository, IMemoryCache cache)
         {
             _directorsRepository = directorsRepository;
+            _cache = cache;
         }
 
         public IActionResult Index(int pageNumber = 1)
         {
             int pageSize = 20;
-            var pagedDirectors = _directorsRepository.GetPagedDirectors(pageNumber, pageSize);
+            List<Director> directors;
 
-            ViewBag.CurrentPage = pagedDirectors.PageNumber;
-            ViewBag.TotalPages = pagedDirectors.TotalPages;
+            if (pageNumber == 1)
+            {
+                // Попробуем извлечь режиссеров из кэша
+                if (!_cache.TryGetValue("directors", out directors))
+                {
+                    // Если в кэше нет данных, извлекаем их из репозитория
+                    var pagedDirectors = _directorsRepository.GetPagedDirectors(pageNumber, pageSize);
+                    directors = pagedDirectors.Items.ToList();
 
-            return View(pagedDirectors.Items);
+                    // Сохраняем данные в кэш
+                    _cache.Set("directors", directors, TimeSpan.FromSeconds(256));
+                }
+            }
+            else
+            {
+                // Если это не первая страница, просто извлекаем режиссеров из репозитория
+                var pagedDirectors = _directorsRepository.GetPagedDirectors(pageNumber, pageSize);
+                directors = pagedDirectors.Items.ToList();
+            }
+
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)_directorsRepository.GetTotalCount() / pageSize);
+
+            return View(directors);
         }
 
         [HttpGet]

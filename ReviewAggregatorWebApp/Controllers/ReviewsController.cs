@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using ReviewAggregatorWebApp.BusinessLogic;
 using ReviewAggregatorWebApp.DTOs;
-using ReviewAggregatorWebApp.Interfaces;
+using ReviewAggregatorWebApp.Interfaces.BusinessLogic;
+using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.Repository;
 using System.Security.Claims;
@@ -51,7 +52,7 @@ public class ReviewsController : Controller
                 review.PostDate = DateTime.Now;
                 _reviewRepository.Create(review);
 
-                IRatingService ratingService = new RatingService(_reviewRepository, _movieRepository);
+                IRatingService ratingService = new RatingLogic(_reviewRepository, _movieRepository);
                 ratingService.CalculateRating(review.MovieId);
                 return Json(new { success = true });
             }

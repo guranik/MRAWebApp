@@ -1,4 +1,4 @@
-﻿using ReviewAggregatorWebApp.Interfaces;
+﻿using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Model;
 
 namespace ReviewAggregatorWebApp.Repository
