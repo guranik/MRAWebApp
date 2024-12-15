@@ -15,6 +15,7 @@ namespace ReviewAggregatorWebApp.ViewModel
 
         [Required(ErrorMessage = "Выберите режиссера.")]
         public int? DirectorId { get; set; } // Идентификатор режиссера
+        public Director? Director { get; set; }
 
         [Required(ErrorMessage = "Дата выпуска обязательна для заполнения.")]
         [DataType(DataType.Date)]

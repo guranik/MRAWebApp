@@ -162,6 +162,7 @@ namespace ReviewAggregatorWebApp.Controllers
                 Name = movie.Name,
                 PosterLink = movie.PosterLink,
                 DirectorId = movie.DirectorId,
+                Director = movie.Director,
                 ReleaseDate = movie.ReleaseDate,
                 CountryIds = movie.Countries.Select(c => c.Id).ToList(),
                 GenreIds = movie.Genres.Select(g => g.Id).ToList(),

@@ -15,8 +15,10 @@
             <input asp-for="PosterLink" class="form-control" />
         </div>
         <div class="form-group">
-            <label asp-for="DirectorId"></label>
-            <select asp-for="DirectorId" class="form-control" asp-items="Model.Directors"></select>
+            <label asp-for="DirectorId">Режиссер</label>
+            <input type="text" class="form-control" id="directorSearch" placeholder="Найти режиссера" aria-label="Search" list="directorList" value="@Model.Director?.Name">
+            <datalist id="directorList"></datalist> <!-- Дата-список для отображения результатов -->
+            <input type="hidden" asp-for="DirectorId" />
             <span asp-validation-for="DirectorId" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -74,7 +76,42 @@
     </form>
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+    $(document).ready(function () {
+    $('#directorSearch').on('input', function () {
+        var namePrefix = $(this).val();
+        if (namePrefix.length > 0) {
+            $.get('/Directors/GetDirectorsByNamePrefix', { namePrefix: namePrefix }, function (data) {
+                $('#directorList').empty(); // Очистить предыдущие результаты
+                if (data.length > 0) {
+                    $.each(data, function (index, director) {
+                        $('#directorList').append(
+                            `<option value="${director.name}" data-id="${director.id}">${director.name}</option>`
+                        );
+                    });
+                } else {
+                    $('#directorList').append('<option value="Режиссеры не найдены." disabled></option>');
+                }
+            });
+        } else {
+            $('#directorList').empty(); // Очистить результаты, если ввод пустой
+        }
+    });
+
+    // Обработка выбора режиссера из списка
+    $('#directorSearch').on('change', function () {
+        var selectedOption = $('#directorList option[value="' + $(this).val() + '"]');
+        if (selectedOption.length) {
+            var directorId = selectedOption.data('id');
+            $('#DirectorId').val(directorId); // Сохранить ID режиссера в скрытом поле
+        } else {
+            $('#DirectorId').val(''); // Очистить ID, если выбранный режиссер не найден
+        }
+    });
+});
+
+
     var expanded = false;
 
     function showCheckboxes(checkboxesClass) {

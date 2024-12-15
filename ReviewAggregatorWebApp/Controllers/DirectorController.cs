@@ -43,6 +43,7 @@ namespace ReviewAggregatorWebApp.Controllers
 
             var directorDtos = directors.Select(d => new DirectorDto
             {
+                Id = d.Id,
                 Name = d.Name
             });
 
