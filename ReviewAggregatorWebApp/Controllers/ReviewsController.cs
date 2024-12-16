@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ReviewAggregatorWebApp.BusinessLogic;
+using ReviewAggregatorWebApp.Services;
 using ReviewAggregatorWebApp.DTOs;
 using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Interfaces.Services;
