@@ -22,13 +22,12 @@
     Layout = "~/Views/Shared/MainLayout.cshtml";
 }
 
-<h1>Фильмы@(genreTitle + yearTitle + directorTitle + countryTitle)</h1>
 
 <div class="filter-section">
-    <form method="get" action="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder })">
-        <div class="form-group">
-            <label for="genre">Жанр:</label>
-            <select id="genre" name="genre" class="form-control">
+    <form method="get" action="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = sortOrder })" class="form-inline">
+        <div class="form-group mb-2 mx-2">
+            <label for="genre" class="mr-2">Жанр:</label>
+            <select id="genre" name="genre" class="form-control form-control-sm">
                 <option value="">Все</option>
                 @foreach (var g in genres)
                 {
@@ -37,9 +36,9 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="year">Год выхода:</label>
-            <select id="year" name="year" class="form-control">
+        <div class="form-group mb-2 mx-2">
+            <label for="year" class="mr-2">Год выхода:</label>
+            <select id="year" name="year" class="form-control form-control-sm">
                 <option value="">Все</option>
                 @foreach (var y in years)
                 {
@@ -48,15 +47,15 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label for="director">Режиссер:</label>
-            <input type="text" class="form-control" id="director" name="director" placeholder="Все" value="@director" aria-label="Search" list="directorList">
-            <datalist id="directorList"></datalist> <!-- Дата-список для отображения результатов -->
+        <div class="form-group mb-2 mx-2">
+            <label for="director" class="mr-2">Режиссер:</label>
+            <input type="text" class="form-control form-control-sm" id="director" name="director" placeholder="Все" value="@director" aria-label="Search" list="directorList">
+            <datalist id="directorList"></datalist>
         </div>
 
-        <div class="form-group">
-            <label for="country">Страна:</label>
-            <select id="country" name="country" class="form-control">
+        <div class="form-group mb-2 mx-2">
+            <label for="country" class="mr-2">Страна:</label>
+            <select id="country" name="country" class="form-control form-control-sm">
                 <option value="">Все</option>
                 @foreach (var c in countries)
                 {
@@ -65,17 +64,22 @@
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+        <button type="submit" class="btn btn-primary btn-sm">Применить фильтр</button>
     </form>
 </div>
 
-<div class="form-group">
-    <label for="sortOptions">Сортировать по:</label>
-    <select id="sortOptions" class="form-control" onchange="location = this.value;">
-        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "rating" })" selected="@(sortOrder == "rating" ? "selected" : null)">По рейтингу</option>
-        <option value="@Url.Action("Filter", new { genra = genre, year = year, director = director, country = country, sortBy = "date" })" selected="@(sortOrder == "date" ? "selected" : null)">По дате</option>
+<h1>Фильмы@(genreTitle + yearTitle + directorTitle + countryTitle)</h1>
+
+
+<div class="form-group mt-2">
+    <label for="sortOptions" class="mr-2">Сортировать по:</label>
+    <select id="sortOptions" class="form-control form-control-sm" onchange="location = this.value;">
+        <option value="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = "rating" })" selected="@(sortOrder == "rating" ? "selected" : null)">Рейтингу</option>
+        <option value="@Url.Action("Filter", new { genre = genre, year = year, director = director, country = country, sortBy = "date" })" selected="@(sortOrder == "date" ? "selected" : null)">Дата</option>
     </select>
 </div>
+
+
 
 @if (User.IsInRole("Admin"))
 {
@@ -86,6 +90,7 @@
 
 @if (Model != null && Model.Any())
 {
+
     <ul>
         @foreach (var movie in Model)
         {

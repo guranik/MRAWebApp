@@ -2,6 +2,7 @@
 @{
     Layout = "~/Views/Shared/BaseLayout.cshtml";
 }
+<div style="margin:20px">
 <h2>Login</h2>
 
 <form asp-action="Login" method="post">
@@ -23,3 +24,4 @@
     <button type="submit" class="btn btn-primary">Login</button>
     <p>Don't have an account? <a href="@Url.Action("Register", "Account")">Register</a>.</p>
 </form>
+</div>
