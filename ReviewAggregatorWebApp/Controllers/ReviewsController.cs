@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using ReviewAggregatorWebApp.BusinessLogic;
 using ReviewAggregatorWebApp.DTOs;
-using ReviewAggregatorWebApp.Interfaces.BusinessLogic;
 using ReviewAggregatorWebApp.Interfaces.Repositories;
+using ReviewAggregatorWebApp.Interfaces.Services;
 using ReviewAggregatorWebApp.Model;
 using ReviewAggregatorWebApp.Repository;
 using System.Security.Claims;
