@@ -16,7 +16,6 @@ using ReviewAggregatorWebApp.Interfaces.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Подключение сервисов
 builder.Services.AddDbContext<Db8428Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection")));
 builder.Services.Configure<InitializationInfo>(builder.Configuration.GetSection("InitializationInfo"));
@@ -65,7 +64,7 @@ using (var scope = app.Services.CreateScope())
     var databaseInitializer = new DatabaseInitializer(movieRepository, directorRepository, genreRepository, countryRepository, initializationInfo);
     try
     {
-        await databaseInitializer.CreateRoles(services); // Вызов метода создания 
+        await databaseInitializer.CreateRoles(services);
     }
     catch (Exception  ex){ }
     try
@@ -76,16 +75,11 @@ using (var scope = app.Services.CreateScope())
 
 }
 
-// Использование middleware для кэширования
 app.UseMiddleware<CachingMiddleware>();
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
-// Использование сессий
 app.UseSession();
 
-// Добавление маршрутизации MVC (если используется)
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

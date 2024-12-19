@@ -1,24 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="ReviewAggregatorWebApp.Controllers.AccountController">
-    <Position X="13.75" Y="12.25" Width="1.5" />
+    <Position X="20.75" Y="11.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAABACAAAAAAAAAAABAAAIAAAABAAAAAAAQAAAAAAA=</HashCode>
       <FileName>Controllers\AccountController.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Field Name="_signInManager" />
       <Field Name="_userManager" />
+      <Field Name="_signInManager" />
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Controllers.CountriesController">
-    <Position X="17.25" Y="9.5" Width="1.5" />
+    <Position X="27.25" Y="14.5" Width="1.5" />
     <AssociationLine Name="_countriesRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllCountries" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="18.75" Y="10.062" />
-        <Point X="19.125" Y="10.062" />
-        <Point X="19.125" Y="10.062" />
-        <Point X="19.75" Y="10.062" />
+        <Point X="27.875" Y="14.5" />
+        <Point X="27.875" Y="14.062" />
+        <Point X="29.5" Y="14.062" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -30,18 +29,32 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Controllers.DirectorsController">
-    <Position X="13.75" Y="9.25" Width="1.5" />
+    <Position X="24" Y="12.25" Width="1.5" />
+    <AssociationLine Name="_directorsRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllDirectors" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="24.938" Y="12.25" />
+        <Point X="24.938" Y="8.25" />
+        <Point X="23.5" Y="8.25" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_cache" Type="Microsoft.Extensions.Caching.Memory.IMemoryCache" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="25.5" Y="13.875" />
+        <Point X="25.75" Y="13.875" />
+        <Point X="25.75" Y="10.062" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIAAAAAAAAAQAAAAAAEAAEACAAkAAAAAAAA=</HashCode>
       <FileName>Controllers\DirectorController.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Field Name="_cache" />
       <Field Name="_directorsRepository" />
+      <Field Name="_cache" />
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Controllers.GenresController">
-    <Position X="22.5" Y="4.25" Width="1.5" />
+    <Position X="33" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAEAAEACAAEAAAAAAAA=</HashCode>
       <FileName>Controllers\GenresController.cs</FileName>
@@ -51,12 +64,12 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Controllers.MovieInfoController">
-    <Position X="23.5" Y="8.75" Width="1.5" />
+    <Position X="35" Y="10" Width="1.5" />
     <AssociationLine Name="_movieRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllMovies" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="24.25" Y="8.75" />
-        <Point X="24.25" Y="8.375" />
-        <Point X="25.5" Y="8.375" />
+        <Point X="35" Y="10.938" />
+        <Point X="33.812" Y="10.938" />
+        <Point X="33.812" Y="12.5" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -68,48 +81,55 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Controllers.MoviesListController">
-    <Position X="24.25" Y="3.5" Width="1.5" />
-    <AssociationLine Name="_cache" Type="Microsoft.Extensions.Caching.Memory.IMemoryCache" FixedFromPoint="true" FixedToPoint="true">
+    <Position X="31.5" Y="9.5" Width="1.5" />
+    <AssociationLine Name="_cache" Type="Microsoft.Extensions.Caching.Memory.IMemoryCache" FixedToPoint="true">
       <Path>
-        <Point X="24.25" Y="3.875" />
-        <Point X="15.25" Y="3.875" />
-        <Point X="15.25" Y="7.75" />
-      </Path>
-    </AssociationLine>
-    <AssociationLine Name="_countriesRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllCountries" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="24.25" Y="4" />
-        <Point X="20" Y="4" />
-        <Point X="20" Y="8" />
-      </Path>
-    </AssociationLine>
-    <AssociationLine Name="_directorsRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllDirectors" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="24.438" Y="3.5" />
-        <Point X="24.438" Y="3.125" />
-        <Point X="11.375" Y="3.125" />
-        <Point X="11.375" Y="11.188" />
-        <Point X="11.75" Y="11.188" />
-      </Path>
-    </AssociationLine>
-    <AssociationLine Name="_genresRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllGenres" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="24.5" Y="5.887" />
-        <Point X="24.5" Y="6.562" />
-        <Point X="22" Y="6.562" />
-      </Path>
-    </AssociationLine>
-    <AssociationLine Name="_yearsRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllYears" FixedToPoint="true">
-      <Path>
-        <Point X="25.75" Y="4.625" />
-        <Point X="26.5" Y="4.625" />
+        <Point X="31.5" Y="9.875" />
+        <Point X="30.708" Y="9.875" Type="JumpStart" />
+        <Point X="30.542" Y="9.875" Type="JumpEnd" />
+        <Point X="26.75" Y="9.875" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="_moviesRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllMovies" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="25" Y="5.887" />
-        <Point X="25" Y="7.562" />
-        <Point X="25.5" Y="7.562" />
+        <Point X="33" Y="11.313" />
+        <Point X="33.438" Y="11.313" />
+        <Point X="33.438" Y="12.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.178" Y="0.252" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="_countriesRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllCountries" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="31.5" Y="11.563" />
+        <Point X="30.625" Y="11.563" />
+        <Point X="30.625" Y="13" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_genresRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllGenres" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="31.875" Y="9.5" />
+        <Point X="31.875" Y="9.125" />
+        <Point X="30.969" Y="9.125" />
+        <Point X="30.969" Y="8.132" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_directorsRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllDirectors" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.5" Y="9.5" />
+        <Point X="32.5" Y="5.25" />
+        <Point X="23.188" Y="5.25" />
+        <Point X="23.188" Y="6" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_yearsRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllYears" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="32.188" Y="9.5" />
+        <Point X="32.188" Y="6.375" />
+        <Point X="32.417" Y="6.375" Type="JumpStart" />
+        <Point X="32.583" Y="6.375" Type="JumpEnd" />
+        <Point X="36.25" Y="6.375" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -118,15 +138,15 @@
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="_cache" />
-      <Field Name="_countriesRepository" />
-      <Field Name="_directorsRepository" />
-      <Field Name="_genresRepository" />
-      <Field Name="_yearsRepository" />
       <Field Name="_moviesRepository" />
+      <Field Name="_countriesRepository" />
+      <Field Name="_genresRepository" />
+      <Field Name="_directorsRepository" />
+      <Field Name="_yearsRepository" />
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Controllers.YearsController">
-    <Position X="26.5" Y="5.5" Width="1.5" />
+    <Position X="36" Y="7.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
       <FileName>Controllers\YearsController.cs</FileName>
@@ -136,12 +156,15 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewsController">
-    <Position X="21.75" Y="7.25" Width="1.5" />
+    <Position X="35.5" Y="11.75" Width="1.5" />
     <AssociationLine Name="_movieRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllMovies" FixedFromPoint="true">
       <Path>
-        <Point X="23.25" Y="8.125" />
-        <Point X="25.5" Y="8.125" />
+        <Point X="35.5" Y="12.937" />
+        <Point X="34" Y="12.937" />
       </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.06" Y="-0.421" Height="0.182" Width="1.81" />
+      </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
       <HashCode>AABAAAAAQAAAAAAAAAAQAAAAAAEAAEAAAAAAAAAAAAA=</HashCode>
@@ -153,91 +176,91 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.DTOs.DirectorDto">
-    <Position X="3" Y="6.5" Width="1.5" />
+    <Position X="9.25" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DTOs\DirectorDto.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.DTOs.MovieDto">
-    <Position X="4.75" Y="6.5" Width="1.5" />
+    <Position X="14.5" Y="8.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DTOs\MovieDto.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.DTOs.ReviewDto">
-    <Position X="1.25" Y="5.5" Width="1.5" />
+    <Position X="16.25" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAEABAAAAAAAAgAAQAAAAEAAQAAAAAAAAA=</HashCode>
       <FileName>DTOs\ReviewDto.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.ApiResponse">
-    <Position X="8.25" Y="8.25" Width="1.5" />
+    <Position X="22.75" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAABAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Middleware\ApiResponseData\ApiResponse.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.CountryInfo">
-    <Position X="1.25" Y="8.25" Width="1.5" />
+    <Position X="29.75" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Middleware\ApiResponseData\CountryInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.GenreInfo">
-    <Position X="8.25" Y="10" Width="1.5" />
+    <Position X="28" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Middleware\ApiResponseData\GenreInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.InitializationInfo">
-    <Position X="15.5" Y="8.5" Width="1.5" />
+    <Position X="23" Y="15.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAIAAAAAAAAAAAAAACAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Middleware\ApiResponseData\InitializationInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.MovieDetails">
-    <Position X="6.5" Y="8.25" Width="1.5" />
+    <Position X="26.25" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACgAAABAAAAAAAAAIAAQQAAAAAEAEAAAAAAAEAAAQ=</HashCode>
       <FileName>Middleware\ApiResponseData\MovieDetails.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.MovieDoc">
-    <Position X="4.75" Y="9.75" Width="1.5" />
+    <Position X="24.5" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Middleware\ApiResponseData\MovieDoc.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.PersonInfo">
-    <Position X="3" Y="8.25" Width="1.5" />
+    <Position X="31.5" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAgAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Middleware\ApiResponseData\PersonInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.PosterInfo">
-    <Position X="3" Y="10" Width="1.5" />
+    <Position X="33.25" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
       <FileName>Middleware\ApiResponseData\PosterInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.ApiResponseData.RatingInfo">
-    <Position X="4.75" Y="8.25" Width="1.5" />
+    <Position X="35" Y="19" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
       <FileName>Middleware\ApiResponseData\RatingInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.CachingMiddleware">
-    <Position X="11.75" Y="5.25" Width="1.5" />
+    <Position X="25.75" Y="6.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEABAIAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAA=</HashCode>
       <FileName>Middleware\CachingMiddleware.cs</FileName>
@@ -248,27 +271,42 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Middleware.DatabaseInitializer">
-    <Position X="15.5" Y="10.5" Width="1.5" />
+    <Position X="25.25" Y="15" Width="1.5" />
     <AssociationLine Name="_movieRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllMovies" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="17" Y="12.812" />
-        <Point X="26.75" Y="12.812" />
-        <Point X="26.75" Y="9.959" />
+        <Point X="26.75" Y="17.5" />
+        <Point X="31.597" Y="17.5" />
+        <Point X="31.597" Y="14.312" />
+        <Point X="32.5" Y="14.312" />
       </Path>
     </AssociationLine>
-    <AssociationLine Name="_genreRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllGenres" FixedFromPoint="true" FixedToPoint="true">
+    <AssociationLine Name="_directorRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllDirectors" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="17" Y="12.688" />
-        <Point X="21.562" Y="12.688" />
-        <Point X="21.562" Y="7.132" />
+        <Point X="25.25" Y="15.375" />
+        <Point X="25.25" Y="15.245" />
+        <Point X="22.75" Y="15.245" />
+        <Point X="22.75" Y="8.709" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_genreRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllGenres" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="26.062" Y="15" />
+        <Point X="26.062" Y="13.692" />
+        <Point X="28.824" Y="13.692" />
+        <Point X="28.824" Y="11.055" />
+        <Point X="30.625" Y="11.055" />
+        <Point X="30.625" Y="8.132" />
       </Path>
     </AssociationLine>
     <AssociationLine Name="_countryRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllCountries" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="17" Y="12.562" />
-        <Point X="20.5" Y="12.562" />
-        <Point X="20.5" Y="10.517" />
+        <Point X="26.75" Y="17.188" />
+        <Point X="30.25" Y="17.188" />
+        <Point X="30.25" Y="15.517" />
       </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.176" Y="0.292" />
+      </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
       <HashCode>EKBAAEAAAIAAAIAIABAQAAAAAgAAACQgQYAAAAAAAAQ=</HashCode>
@@ -276,85 +314,94 @@
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="_movieRepository" />
-      <Field Name="_initInfo" />
-      <Field Name="_genreRepository" />
       <Field Name="_directorRepository" />
+      <Field Name="_genreRepository" />
       <Field Name="_countryRepository" />
       <Field Name="_httpClient" />
+      <Field Name="_initInfo" />
     </ShowAsAssociation>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Migrations.Initial">
-    <Position X="6.5" Y="6.25" Width="1.5" />
+    <Position X="16" Y="16.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAI=</HashCode>
       <FileName>Migrations\20241206134815_Initial.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Migrations.Db8428ContextModelSnapshot">
-    <Position X="8.25" Y="6.5" Width="1.5" />
+    <Position X="18" Y="16.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAA=</HashCode>
       <FileName>Migrations\Db8428ContextModelSnapshot.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Model.Country">
-    <Position X="2.75" Y="11.25" Width="1.5" />
+    <Position X="11" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAEAAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Model\Country.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ReviewAggregatorWebApp.Model.Db8428Context" Collapsed="true">
-    <Position X="22.5" Y="16.5" Width="1.5" />
+  <Class Name="ReviewAggregatorWebApp.Model.Db8428Context">
+    <Position X="14" Y="16.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAFAAAQAQEAAAAAIAAQAAEAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Model\Db8428Context.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Model.Director">
-    <Position X="1" Y="12.25" Width="1.5" />
+    <Position X="9.25" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAEAAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Model\Director.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Model.Genre">
-    <Position X="4.5" Y="11.25" Width="1.5" />
+    <Position X="12.75" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAEAAEAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Model\Genre.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Model.Movie">
-    <Position X="6.25" Y="11.25" Width="1.5" />
+    <Position X="14.5" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAFAAAAAIAACAAAIAARQAAAAAAAEAAAAAAAEAAAA=</HashCode>
       <FileName>Model\Movie.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Model.PagedList&lt;T&gt;">
-    <Position X="1" Y="9.75" Width="1.5" />
+    <Position X="19.75" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAAgAAAAAADAAAAAAAAAAAAAAAAAAAAAAAEAAAAAA=</HashCode>
       <FileName>Model\PagedList.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Model.Review">
-    <Position X="8" Y="11.75" Width="1.5" />
+    <Position X="16.25" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAADAAAAAAAEEBAAAAAAAAgAAQAAAAEAAAAAAAAAAAA=</HashCode>
       <FileName>Model\Review.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Model.User">
-    <Position X="9.75" Y="12.75" Width="1.5" />
+    <Position X="18" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>Model\User.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.Repository.CountryRepository" BaseTypeListCollapsed="true">
-    <Position X="17.5" Y="13.25" Width="1.5" />
+    <Position X="9.75" Y="19.75" Width="1.5" />
+    <AssociationLine Name="_context" Type="ReviewAggregatorWebApp.Model.Db8428Context" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.5" Y="19.75" />
+        <Point X="10.5" Y="18.938" />
+        <Point X="12.167" Y="18.938" Type="JumpStart" />
+        <Point X="12.333" Y="18.938" Type="JumpEnd" />
+        <Point X="14" Y="18.938" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAABABAAAAABAAAAAEAAEAAAAAAAAAACIA=</HashCode>
       <FileName>Repository\CountryRepository.cs</FileName>
@@ -365,7 +412,14 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Repository.DirectorRepository" BaseTypeListCollapsed="true">
-    <Position X="19.25" Y="13.25" Width="1.5" />
+    <Position X="11.5" Y="19.75" Width="1.5" />
+    <AssociationLine Name="_context" Type="ReviewAggregatorWebApp.Model.Db8428Context" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.25" Y="19.75" />
+        <Point X="12.25" Y="18.375" />
+        <Point X="14" Y="18.375" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAABACAAAAQBAAAAAEAAEAAAAAAgAAAAIA=</HashCode>
       <FileName>Repository\DirectorRepository.cs</FileName>
@@ -376,7 +430,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Repository.GenreRepository" BaseTypeListCollapsed="true">
-    <Position X="21" Y="13.25" Width="1.5" />
+    <Position X="13.25" Y="19.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAABABAAAAAAAAAAAEAAEAAAAAAAAAAAIA=</HashCode>
       <FileName>Repository\GenreRepository.cs</FileName>
@@ -387,7 +441,16 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Repository.MovieRepository" BaseTypeListCollapsed="true">
-    <Position X="26.25" Y="13.25" Width="1.5" />
+    <Position X="18.5" Y="19.75" Width="1.5" />
+    <AssociationLine Name="_context" Type="ReviewAggregatorWebApp.Model.Db8428Context" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="19.219" Y="19.75" />
+        <Point X="19.219" Y="18.938" />
+        <Point X="17.583" Y="18.938" Type="JumpStart" />
+        <Point X="17.417" Y="18.938" Type="JumpEnd" />
+        <Point X="15.5" Y="18.938" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAQAIAAAQAAABAAAAAAABAAAAAEAAEAAAAAAAACAAIA=</HashCode>
       <FileName>Repository\MovieRepository.cs</FileName>
@@ -398,9 +461,9 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Repository.ReviewRepository" BaseTypeListCollapsed="true">
-    <Position X="22.75" Y="13.25" Width="1.5" />
+    <Position X="15" Y="19.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQAAAAAAAAABAAAAAAAAIAAIAEgAUAAAAAAAAAAAIA=</HashCode>
+      <HashCode>AAQAAAAAAAAABgAAAAAAAIAAIAEgAUAAAAAAAAAAAIA=</HashCode>
       <FileName>Repository\ReviewRepository.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -409,7 +472,14 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Repository.UserRepository" BaseTypeListCollapsed="true">
-    <Position X="24.5" Y="13.25" Width="1.5" />
+    <Position X="16.75" Y="19.75" Width="1.5" />
+    <AssociationLine Name="_context" Type="ReviewAggregatorWebApp.Model.Db8428Context" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="17.5" Y="19.75" />
+        <Point X="17.5" Y="18.312" />
+        <Point X="15.5" Y="18.312" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAQAAAAAAQAABAAAAAAAAAAAAAEAAEAAEAAAAAAAAAA=</HashCode>
       <FileName>Repository\UserRepository.cs</FileName>
@@ -420,7 +490,7 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Repository.YearRepository" BaseTypeListCollapsed="true">
-    <Position X="15.75" Y="14.5" Width="1.5" />
+    <Position X="20.25" Y="19.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAABAAIAAAAAAAAAAAQAAAAAAAA=</HashCode>
       <FileName>Repository\YearRepository.cs</FileName>
@@ -428,7 +498,16 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Services.CachedCountriesService" BaseTypeListCollapsed="true">
-    <Position X="17.25" Y="7.75" Width="1.5" />
+    <Position X="26.5" Y="11.5" Width="1.5" />
+    <AssociationLine Name="_countriesRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllCountries" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="27.188" Y="12.796" />
+        <Point X="27.188" Y="13.438" />
+        <Point X="28.74" Y="13.438" Type="JumpStart" />
+        <Point X="28.907" Y="13.438" Type="JumpEnd" />
+        <Point X="29.5" Y="13.438" />
+      </Path>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>AAAAAEAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
       <FileName>Services\CachedCountriesService.cs</FileName>
@@ -440,11 +519,19 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Services.CachedDirectorsService" BaseTypeListCollapsed="true">
-    <Position X="11.75" Y="7.5" Width="1.5" />
-    <AssociationLine Name="_directorsRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllDirectors" FixedFromPoint="true">
+    <Position X="23" Y="9.25" Width="1.5" />
+    <AssociationLine Name="_directorsRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllDirectors" FixedToPoint="true">
       <Path>
-        <Point X="12.5" Y="8.796" />
-        <Point X="12.5" Y="9.25" />
+        <Point X="23.375" Y="9.25" />
+        <Point X="23.375" Y="8.709" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_cache" Type="Microsoft.Extensions.Caching.Memory.IMemoryCache" FixedFromPoint="true">
+      <Path>
+        <Point X="24.5" Y="9.75" />
+        <Point X="24.854" Y="9.75" Type="JumpStart" />
+        <Point X="25.021" Y="9.75" Type="JumpEnd" />
+        <Point X="25.25" Y="9.75" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -458,12 +545,20 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Services.CachedGenresService" BaseTypeListCollapsed="true">
-    <Position X="16.25" Y="5.5" Width="1.5" />
-    <AssociationLine Name="_cache" Type="Microsoft.Extensions.Caching.Memory.IMemoryCache" FixedFromPoint="true" FixedToPoint="true">
+    <Position X="27.75" Y="6.75" Width="1.5" />
+    <AssociationLine Name="_genresRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllGenres" FixedFromPoint="true">
       <Path>
-        <Point X="16.25" Y="6.148" />
-        <Point X="15.875" Y="6.148" />
-        <Point X="15.875" Y="7.75" />
+        <Point X="29.25" Y="6.875" />
+        <Point X="30.5" Y="6.875" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_cache" Type="Microsoft.Extensions.Caching.Memory.IMemoryCache" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="27.75" Y="7.5" />
+        <Point X="27.5" Y="7.5" />
+        <Point X="27.5" Y="8.94" />
+        <Point X="26.625" Y="8.94" />
+        <Point X="26.625" Y="9.5" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -477,11 +572,20 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.Services.RatingLogic" BaseTypeListCollapsed="true">
-    <Position X="24.5" Y="11" Width="1.5" />
-    <AssociationLine Name="_movieRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllMovies" FixedFromPoint="true">
+    <Position X="33.75" Y="16.5" Width="1.5" />
+    <AssociationLine Name="_movieRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllMovies" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="25.812" Y="11" />
-        <Point X="25.812" Y="9.959" />
+        <Point X="33.938" Y="16.5" />
+        <Point X="33.938" Y="16.125" />
+        <Point X="33.938" Y="16.125" />
+        <Point X="33.938" Y="15.209" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="_reviewRepository" Type="ReviewAggregatorWebApp.Interfaces.Repositories.IAllReviews" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="34.625" Y="16.5" />
+        <Point X="34.625" Y="15.698" />
+        <Point X="35.5" Y="15.698" />
       </Path>
     </AssociationLine>
     <TypeIdentifier>
@@ -495,142 +599,142 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="ReviewAggregatorWebApp.ViewModel.CountryViewModel">
-    <Position X="6.25" Y="14.75" Width="1.5" />
+    <Position X="13.25" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAQAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ViewModel\CountryViewModel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.ViewModel.DirectorViewModel">
-    <Position X="8" Y="14.75" Width="1.5" />
+    <Position X="15" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAQAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ViewModel\DirectorViewModel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.ViewModel.GenreViewModel">
-    <Position X="9.75" Y="14.75" Width="1.5" />
+    <Position X="11.5" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAQAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ViewModel\GenreViewModel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.ViewModel.LoginViewModel">
-    <Position X="1" Y="14.75" Width="1.5" />
+    <Position X="17" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAACAAAAAAAgAAA=</HashCode>
       <FileName>ViewModel\LoginViewModel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.ViewModel.MovieViewModel">
-    <Position X="2.75" Y="13.5" Width="1.5" />
+    <Position X="13.75" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACABAAQAAIAAAAAAoAARQAAAAAAAAAAAAAAAEAAAA=</HashCode>
       <FileName>ViewModel\MovieViewModel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ReviewAggregatorWebApp.ViewModel.RegisterViewModel">
-    <Position X="4.5" Y="14.25" Width="1.5" />
+    <Position X="17" Y="12.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAEAAAAAAAAAAAAAACAAAQAAAAIAA=</HashCode>
       <FileName>ViewModel\RegisterViewModel.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="System.Net.Http.HttpClient" Collapsed="true">
-    <Position X="18.25" Y="11.75" Width="1.5" />
+    <Position X="23" Y="17.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Microsoft.AspNetCore.Identity.SignInManager&lt;TUser&gt;" Collapsed="true">
-    <Position X="12" Y="12.25" Width="1.5" />
+    <Position X="19" Y="11.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Class Name="Microsoft.AspNetCore.Identity.UserManager&lt;TUser&gt;" Collapsed="true">
-    <Position X="12" Y="13.25" Width="1.5" />
+    <Position X="19" Y="12.5" Width="1.5" />
     <TypeIdentifier />
   </Class>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Repositories.IAllCountries">
-    <Position X="19.75" Y="8" Width="1.5" />
+    <Position X="29.5" Y="13" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAABAAAAABAAAAAEAAEAAAAAAAAAACIA=</HashCode>
       <FileName>Interfaces\Repositories\IAllCountries.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Repositories.IAllDirectors">
-    <Position X="11.75" Y="9.25" Width="1.5" />
+    <Position X="22" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAACAAAAQBAAAAAEAAEAAAAAAgAAAAIA=</HashCode>
       <FileName>Interfaces\Repositories\IAllDirectors.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Repositories.IAllGenres">
-    <Position X="20.5" Y="5" Width="1.5" />
+    <Position X="30.5" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAABAAAAAAAAAAAEAAEAAAAAAAAAAAIA=</HashCode>
       <FileName>Interfaces\Repositories\IAllGenres.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Repositories.IAllMovies">
-    <Position X="25.5" Y="7.25" Width="1.5" />
+    <Position X="32.5" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAIAAAQAAAAAAAAAAABAAAAAEAAEAAAAAAAACAAIA=</HashCode>
       <FileName>Interfaces\Repositories\IAllMovies.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Repositories.IAllReviews">
-    <Position X="21.75" Y="9.5" Width="1.5" />
+    <Position X="35.5" Y="14" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAAAAAAAAAAAAAIAAIAEgAUAAAAAAAAAAAIA=</HashCode>
       <FileName>Interfaces\Repositories\IAllReviews.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Repositories.IAllUsers">
-    <Position X="13.75" Y="14.5" Width="1.5" />
+    <Position X="20.75" Y="13.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAQAAAAAAQAAAAAAAAAAAAAAAAEAAEAAEAAAAAAAAAA=</HashCode>
       <FileName>Interfaces\Repositories\IAllUsers.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Repositories.IAllYears">
-    <Position X="26.5" Y="3.75" Width="1.5" />
+    <Position X="36.25" Y="5.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAA=</HashCode>
       <FileName>Interfaces\Repositories\IAllYears.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Services.ICachedCountries">
-    <Position X="6.5" Y="4.75" Width="1.5" />
+    <Position X="26.5" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
       <FileName>Interfaces\Services\ICachedCountries.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Services.ICachedDirectors">
-    <Position X="8.25" Y="4.75" Width="1.5" />
+    <Position X="23" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
       <FileName>Interfaces\Services\ICachedDirectors.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Services.ICachedGenres">
-    <Position X="4.75" Y="4.75" Width="1.5" />
+    <Position X="27.75" Y="8.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Interfaces\Services\ICachedGenres.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="ReviewAggregatorWebApp.Interfaces.Services.IRatingService">
-    <Position X="3" Y="4.75" Width="1.5" />
+    <Position X="32" Y="16.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Interfaces\Services\IRatingService.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Microsoft.Extensions.Caching.Memory.IMemoryCache" Collapsed="true">
-    <Position X="14.5" Y="7.75" Width="1.5" />
+    <Position X="25.25" Y="9.5" Width="1.5" />
     <TypeIdentifier />
   </Interface>
   <Interface Name="Microsoft.Extensions.DependencyInjection.IServiceScopeFactory" Collapsed="true">
-    <Position X="11.75" Y="4" Width="1.5" />
+    <Position X="25.75" Y="5.5" Width="1.5" />
     <TypeIdentifier />
   </Interface>
   <Font Name="Segoe UI" Size="9" />

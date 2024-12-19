@@ -48,6 +48,13 @@ namespace ReviewAggregatorWebApp.Repository
             .Include(x => x.User)
             .Include(x => x.Movie);
 
+        public Review? GetByMovieUser(int movieId, int userId) => _context.Reviews
+            .Where(x => x.MovieId == movieId)
+            .Where(x => x.UserId == userId)
+            .Include(x => x.User)
+            .Include(x => x.Movie)
+            .FirstOrDefault();
+        
         public void Create(Review review)
         {
             _context.Reviews.Add(review);

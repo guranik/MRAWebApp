@@ -17,7 +17,7 @@ namespace ReviewAggregatorWebApp.Repository
 
         private void InitializeYears()
         {
-            for (int year = DateTime.Now.Year - 10; year <= DateTime.Now.Year; year++)
+            for (int year = DateTime.Now.Year; year >= DateTime.Now.Year - 10; year--)
             {
                 _years.Add(year);
             }

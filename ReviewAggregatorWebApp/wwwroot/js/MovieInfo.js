@@ -38,7 +38,6 @@ function submitReview() {
         dataType: "json",
         success: function (data) {
             if (data.success) {
-                alert("Отзыв успешно добавлен!");
                 loadReviews(movieId, 1); // Reload reviews
                 $('#review-text').val(""); // Clear the text area
                 selectedRating = 0; // Reset rating

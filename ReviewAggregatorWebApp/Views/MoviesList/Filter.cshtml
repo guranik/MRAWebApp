@@ -90,27 +90,25 @@
 
 @if (Model != null && Model.Any())
 {
-
     <ul>
         @foreach (var movie in Model)
         {
-            <li class="movie-item" style="display: flex; align-items: flex-start;">
-                <div class="movie-poster" style="margin-right: 15px; height: 150px; overflow: hidden;">
-                    <img src="@movie.PosterLink" alt="@movie.Name" style="height: 100%; width: auto; display: block; margin: auto; font-size: 8px;" onerror="this.onerror=null; this.src='path/to/placeholder-image.jpg';" />
+            <li class="movie-item" style="display: flex; align-items: flex-start; justify-content: flex-start; padding: 0;">
+                <div class="movie-poster" style="margin-right: 15px; padding: 10px; height: 150px; overflow: hidden;">
+                    <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })">
+                        <img src="@movie.PosterLink" alt="@movie.Name" style="height: 100%; width: auto; display: block; margin: auto; font-size: 8px;" onerror="this.onerror=null; this.src='path/to/placeholder-image.jpg';" />
+                    </a>
                 </div>
 
-                <div class="movie-info" style="flex: 2; max-width: 600px;">
+                <div class="movie-info" style="flex-grow: 1; margin-left: 0; display: flex; flex-direction: column;">
                     <a href="@Url.Action("Details", "MovieInfo", new { id = movie.Id })" class="movie-link" style="display: block; max-width: 600px;">
                         <strong>
                             @movie.Name
                         </strong> - @(movie.ReleaseDate.Year.ToString())
                         <br />
-                        Рейтинг Kp: @(movie.KpRating.ToString())
-                        @if(movie.Rating != null)
+                        Рейтинг: Kp: @(movie.KpRating.ToString()) @if (movie.Rating != null)
                         {
-                            <div>
-                                Рейтинг Отзывов: @(movie.Rating.ToString()) / 5
-                            </div>
+                            <span>Отзывы: @(movie.Rating.ToString())/5,00</span>
                         }
                         <br />
                         Жанр: @string.Join(", ", movie.Genres?.Select(g => g.Name) ?? new List<string> { "-" })
@@ -121,13 +119,13 @@
                     </a>
                 </div>
 
-                @if (User .IsInRole("Admin"))
-                {
-                    <div style="margin-left: 15px; display: flex; flex-direction: column; justify-content: center;">
-                        <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary">Изменить</a>
+                <div style="margin-top: 30px; margin-right: 10px;">
+                    @if (User .IsInRole("Admin"))
+                    {
+                        <a href="@Url.Action("Edit", new {id = movie.Id})" class="btn btn-secondary" style="margin-right: 10px;">Изменить</a>
                         <button class="btn btn-danger" onclick="confirmDelete(@movie.Id)">Удалить</button>
-                    </div>
-                }
+                    }
+                </div>
             </li>
         }
     </ul>

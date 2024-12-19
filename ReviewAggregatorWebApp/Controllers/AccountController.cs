@@ -20,9 +20,13 @@ namespace ReviewAggregatorWebApp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Register(string returnUrl = null)
         {
-            return View();
+            var model = new RegisterViewModel
+            {
+                ReturnUrl = returnUrl
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -35,8 +39,8 @@ namespace ReviewAggregatorWebApp.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, model.Role);
-                    await AddClaimsAsync(user); // Вызов метода для добавления claims
-                    return RedirectToAction("Index", "Genres");
+                    await AddClaimsAsync(user);
+                    return Redirect(model.ReturnUrl ?? Url.Action("Index", "Genres"));
                 }
                 foreach (var error in result.Errors)
                 {
@@ -45,10 +49,15 @@ namespace ReviewAggregatorWebApp.Controllers
             }
             return View(model);
         }
+
         [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
+        public IActionResult Login(string returnUrl = null)
+        {            
+            var model = new LoginViewModel
+            {
+                ReturnUrl = returnUrl
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -60,26 +69,23 @@ namespace ReviewAggregatorWebApp.Controllers
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(model.Email);
-                    await AddClaimsAsync(user); // Вызов метода для добавления claims
-
-                    return RedirectToAction("Index", "Genres");
+                    await AddClaimsAsync(user);
+                    return Redirect(model.ReturnUrl ?? Url.Action("Index", "Genres"));
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
             return View(model);
         }
 
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Genres");
+            return Redirect(returnUrl ?? Url.Action("Index", "Genres"));
         }
 
         private async Task AddClaimsAsync(User user)
         {
             var roles = await _userManager.GetRolesAsync(user);
-
-            // Добавление claims
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
@@ -89,7 +95,6 @@ namespace ReviewAggregatorWebApp.Controllers
 
             var claimsIdentity = new ClaimsIdentity(claims, "Login");
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
             await HttpContext.SignInAsync(claimsPrincipal);
         }
     }

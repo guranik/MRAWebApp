@@ -62,7 +62,7 @@ namespace ReviewAggregatorWebApp.Middleware
 
         public async Task InitializeAsync()
         {
-            int startPage = _initInfo.LastProcessedPage + 150;
+            int startPage = ++_initInfo.LastProcessedPage;
             if (_initInfo.LastRequestDate.Date != DateTime.Now.Date) _initInfo.RemainingRequests = 195;
             var movieIds = await GetMovieIdsAsync(startPage);
          
@@ -89,10 +89,10 @@ namespace ReviewAggregatorWebApp.Middleware
 
             do
             {
-                var jsonResponse = await FetchDataAsync($"{BaseUrl}/v1.4/movie?year=2021&limit=50&page={currentPage}", currentPage);
+                var jsonResponse = await FetchDataAsync($"{BaseUrl}/v1.4/movie?year=2019&limit=250&page={currentPage}", currentPage);
                 var result = JsonConvert.DeserializeObject<ApiResponse>(jsonResponse);
 
-                movieIds.AddRange(result.Docs.Select(m => m.Id));
+                movieIds.AddRange(result.Docs.Where(m => m.Poster != null && !m.Poster.Url.IsNullOrEmpty()).Select(m => m.Id));
 
                 currentPage++;
             } while (currentPage <= endPage);
@@ -172,7 +172,7 @@ namespace ReviewAggregatorWebApp.Middleware
             {
                 Name = movieDetails.Name ?? movieDetails.AlternativeName ?? movieDetails.EnName,
                 ReleaseDate = new DateTime(movieDetails.Year, 1, 1), // Установка года выпуска
-                Rating = (decimal)(movieDetails.Rating.Kp != 0 ? movieDetails.Rating.Imdb : movieDetails.Rating.Kp),
+                KpRating = (decimal)(movieDetails.Rating.Kp != 0 ? movieDetails.Rating.Imdb : movieDetails.Rating.Kp),
                 DirectorId = director != null? director.Id : null,
                 Genres = genres,
                 Countries = countries,

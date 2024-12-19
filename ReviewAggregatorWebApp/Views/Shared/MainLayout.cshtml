@@ -1,20 +1,21 @@
 ﻿@{
     Layout = "~/Views/Shared/BaseLayout.cshtml";
 }
+
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="@Url.Action("Index", "Genres")">Главная</a>
             <div class="d-flex align-items-center">
                 <input type="text" class="form-control me-2" id="movieSearch" placeholder="Найти фильм" aria-label="Search" list="movieList">
-                <datalist id="movieList"></datalist> <!-- Дата-список для отображения результатов -->
+                <datalist id="movieList"></datalist>
                 @if (User.Identity.IsAuthenticated)
                 {
                     <button class="btn btn-secondary" id="logout-button">Выйти</button>
                 }
                 else
                 {
-                    <a class="btn btn-outline-success" href="@Url.Action("Login", "Account")" type="button">Войти</a>
+                    <a class="btn btn-outline-success" href="@Url.Action("Login", "Account", new {returnUrl = Context.Request.Path})" type="button">Войти</a>
                 }
             </div>
         </div>
@@ -23,6 +24,7 @@
 <div class="container mt-4">
     @RenderBody()
 </div>
+
 
 @section Scripts {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -62,7 +64,7 @@
         if (logoutButton) {
             logoutButton.addEventListener('click', function () {
                 if (confirm("Вы уверены, что хотите выйти?")) {
-                    window.location.href = '@Url.Action("Logout", "Account")';
+                    window.location.href = '@Url.Action("Logout", "Account", new {returnUrl = Context.Request.Path})';
                 }
             });
         }

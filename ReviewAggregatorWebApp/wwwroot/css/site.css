@@ -57,7 +57,6 @@ body {
 
 .movie-item {
     width: 900px;
-    height: 160px;
     background-color: white;
     margin: 10px 0; /* Отступ между элементами списка */
     transition: background-color 0.3s; /* Плавный переход цвета фона */
@@ -69,7 +68,6 @@ body {
     }
 
 .movie-info {
-    padding: 10px; /* Отступы внутри блока */
 }
 
 .movie-link {
