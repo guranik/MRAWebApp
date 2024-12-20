@@ -22,7 +22,7 @@ public class ReviewsController : Controller
     [HttpGet]
     public IActionResult GetReviews(int movieId, int page = 1)
     {
-        var reviews = _reviewRepository.GetPagedReviews(movieId, page, 10);
+        var reviews = _reviewRepository.GetPagedReviews(movieId, page, 5);
 
         var reviewDtos = reviews.Items.Select(r => new ReviewDto
         {

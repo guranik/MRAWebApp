@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.IdentityModel.Tokens;
 using ReviewAggregatorWebApp.DTOs;
 using ReviewAggregatorWebApp.Interfaces.Repositories;
 using ReviewAggregatorWebApp.Model;
@@ -40,6 +41,14 @@ namespace ReviewAggregatorWebApp.Controllers
 
         public IActionResult Filter(string genre = "", string year = "", string director = "", string country = "", string sortBy = "rating", int pageNumber = 1)
         {
+                HttpContext.Session.SetString("FilterGenre", genre);
+                HttpContext.Session.SetString("FilterYear", year);
+                HttpContext.Session.SetString("FilterDirector", director);
+                HttpContext.Session.SetString("FilterCountry", country);
+                HttpContext.Session.SetString("SortOrder", sortBy);
+                HttpContext.Session.SetInt32("CurrentPage", pageNumber);
+            
+
             if(!_cache.TryGetValue("genres", out var genres))
             {
                 throw new Exception("Жанры не найдены в кэше.");
@@ -62,12 +71,6 @@ namespace ReviewAggregatorWebApp.Controllers
                 sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
             }
 
-            HttpContext.Session.SetString("FilterGenre", genre);
-            HttpContext.Session.SetString("FilterYear", year);
-            HttpContext.Session.SetString("FilterDirector", director);
-            HttpContext.Session.SetString("FilterCountry", country);
-            HttpContext.Session.SetInt32("CurrentPage", pageNumber);
-
             var filteredMovies = _moviesRepository.GetPagedMovies(genre, year, director, country, sortBy, pageNumber, 15);  
 
             // Передаем данные для фильтров в представление
@@ -82,6 +85,7 @@ namespace ReviewAggregatorWebApp.Controllers
             ViewBag.SortOrder = sortBy;
             ViewBag.CurrentPage = filteredMovies.PageNumber;
             ViewBag.TotalPages = filteredMovies.TotalPages;
+
 
             return View(filteredMovies.Items);
         }
@@ -240,7 +244,7 @@ namespace ReviewAggregatorWebApp.Controllers
             var sortBy = HttpContext.Session.GetString("SortOrder") ?? "rating";
             var pageNumber = HttpContext.Session.GetInt32("CurrentPage") ?? 1;
 
-            return RedirectToAction("Filter", new { genre, year, director, country, sortBy, pageNumber });
+            return RedirectToAction("Filter", new { genre, year, director, country, sortBy, pageNumber } );
         }
     }
 }
