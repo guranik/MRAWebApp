@@ -17,6 +17,9 @@ namespace ReviewAggregatorWebApp.Repository
         }
 
         public IEnumerable<Country> AllCountries => _context.Countries;
+
+        public IEnumerable<Country> SortedCountries => _context.Countries.OrderBy(c => c.Name);
+
         public int GetTotalCount() => _context.Countries.Count();
 
         public PagedList<Country> GetPagedCountries(int pageNumber, int pageSize)

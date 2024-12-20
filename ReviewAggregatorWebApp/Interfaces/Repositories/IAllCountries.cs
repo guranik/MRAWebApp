@@ -10,6 +10,7 @@ namespace ReviewAggregatorWebApp.Interfaces.Repositories
     public interface IAllCountries
     {
         IEnumerable<Country> AllCountries { get; }
+        IEnumerable<Country> SortedCountries { get; }
         int GetTotalCount();
         PagedList<Country> GetPagedCountries(int pageNumber, int pageSize);
         Country GetById(int id);

@@ -18,6 +18,8 @@ namespace ReviewAggregatorWebApp.Repository
         }
 
         public IEnumerable<Director> AllDirectors => _context.Directors;
+        public IEnumerable<Director> SortedDirectors => _context.Directors.OrderBy(c => c.Name);
+
 
         public int GetTotalCount() => _context.Directors.Count();
         public PagedList<Director> GetPagedDirectors(int pageNumber, int pageSize)

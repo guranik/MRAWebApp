@@ -17,6 +17,7 @@ namespace ReviewAggregatorWebApp.Repository
         }
 
         public IEnumerable<Genre> AllGenres => _context.Genres;
+        public IEnumerable<Genre> SortedGenres => _context.Genres.OrderBy(c => c.Name);
 
         public Genre GetById(int id) => _context.Genres.Find(id)
             ?? throw new InvalidOperationException($"Genre with ID {id} not found.");

@@ -10,6 +10,7 @@ namespace ReviewAggregatorWebApp.Interfaces.Repositories
     public interface IAllGenres
     {
         IEnumerable<Genre> AllGenres { get; }
+        IEnumerable<Genre> SortedGenres { get; }
         Genre GetById(int id);
         void Create(Genre genre);
         void Update(Genre genre);

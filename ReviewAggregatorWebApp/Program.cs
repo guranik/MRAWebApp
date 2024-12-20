@@ -49,7 +49,6 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
 .AddEntityFrameworkStores<Db8428Context>()
 .AddDefaultTokenProviders();
 
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

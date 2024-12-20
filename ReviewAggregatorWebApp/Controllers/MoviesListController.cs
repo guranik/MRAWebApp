@@ -94,9 +94,9 @@ namespace ReviewAggregatorWebApp.Controllers
         {
             var viewModel = new MovieViewModel
             {
-                Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name"),
-                Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name"),
-                Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name")
+                Directors = new SelectList(_directorsRepository.SortedDirectors, "Id", "Name"),
+                Genres = new SelectList(_genresRepository.SortedGenres, "Id", "Name"),
+                Countries = new SelectList(_countriesRepository.SortedCountries, "Id", "Name")
             };
             return View(viewModel);
         }
@@ -130,9 +130,9 @@ namespace ReviewAggregatorWebApp.Controllers
             }
 
             // Заполнение списков в случае ошибки валидации
-            model.Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name");
-            model.Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name");
-            model.Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name");
+            model.Directors = new SelectList(_directorsRepository.SortedDirectors, "Id", "Name");
+            model.Genres = new SelectList(_genresRepository.SortedGenres, "Id", "Name");
+            model.Countries = new SelectList(_countriesRepository.SortedCountries, "Id", "Name");
             return View(model);
         }
 
@@ -170,9 +170,9 @@ namespace ReviewAggregatorWebApp.Controllers
                 ReleaseDate = movie.ReleaseDate,
                 CountryIds = movie.Countries.Select(c => c.Id).ToList(),
                 GenreIds = movie.Genres.Select(g => g.Id).ToList(),
-                Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name"),
-                Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name"),
-                Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name"),
+                Directors = new SelectList(_directorsRepository.SortedDirectors, "Id", "Name"),
+                Genres = new SelectList(_genresRepository.SortedGenres, "Id", "Name"),
+                Countries = new SelectList(_countriesRepository.SortedCountries, "Id", "Name"),
                 IsEditing = true
             };
 
@@ -215,9 +215,9 @@ namespace ReviewAggregatorWebApp.Controllers
             }
 
             // Заполнение списков в случае ошибки валидации
-            model.Directors = new SelectList(_directorsRepository.AllDirectors, "Id", "Name");
-            model.Genres = new SelectList(_genresRepository.AllGenres, "Id", "Name");
-            model.Countries = new SelectList(_countriesRepository.AllCountries, "Id", "Name");
+            model.Directors = new SelectList(_directorsRepository.SortedDirectors, "Id", "Name");
+            model.Genres = new SelectList(_genresRepository.SortedGenres, "Id", "Name");
+            model.Countries = new SelectList(_countriesRepository.SortedCountries, "Id", "Name");
             model.IsEditing = true;
             return View(model);
         }
